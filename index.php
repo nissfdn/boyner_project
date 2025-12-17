@@ -8,7 +8,7 @@
 <body>
 <div class="navbar">
     <div>
-        
+        <p>logo</p>
     </div>
 
 </div>
