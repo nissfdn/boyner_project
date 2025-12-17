@@ -1,3 +1,33 @@
+<?php
+session_start();
+include "config/db.php";
+echo "index calisiyor<br>";
+
+if (isset($_SESSION['user'])) {
+    header("Location: products.php");
+    exit();
+}
+
+$error = "";
+
+if (isset($_POST['login'])) {
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+    $result = mysqli_query($conn, $sql);
+
+    if (mysqli_num_rows($result) == 1) {
+        $_SESSION['user'] = $username;
+        header("Location: products.php");
+        exit();
+    } else {
+        $error = "Invalid username or password!";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,43 +42,6 @@
         <p>logo</p>
     </div>
 </div>
-
-<?php
-include "config/db.php";
-echo "index calisiyor<br>";
-
-// Eğer kullanıcı zaten giriş yaptıysa products.php'ye gönder
-if (isset($_SESSION['user'])) {
-    header("Location: products.php");
-    exit();
-}
-
-$error = "";
-
-// Login butonuna basıldıysa
-if (isset($_POST['login'])) {
-
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    // Veritabanında kullanıcı var mı kontrol et
-    $sql = "SELECT * FROM users 
-            WHERE username='$username' 
-            AND password='$password'";
-
-    $result = mysqli_query($conn, $sql);
-
-    if (mysqli_num_rows($result) == 1) {
-        // Login başarılı
-        $_SESSION['user'] = $username;
-        header("Location: products.php");
-        exit();
-    } else {
-        // Login başarısız
-        $error = "Invalid username or password!";
-    }
-}
-?>
 
 <h2>Welcome to Boyner Çocuk</h2>
 
