@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
 <?php
 include "Config.php";
 
@@ -32,7 +29,8 @@ $sql .= " LIMIT 25";
 $result = $mysqli->query($sql);
 ?>
 
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>Products</title>
     <link rel="stylesheet" href="style.css">
