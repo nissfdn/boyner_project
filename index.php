@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "config/db.php";
+include "config.php";
 echo "index calisiyor<br>";
 
 if (isset($_SESSION['user'])) {
