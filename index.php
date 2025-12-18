@@ -4,7 +4,7 @@ include "config.php";
 echo "index calisiyor<br>";
 
 if (isset($_SESSION['user'])) {
-    header("Location: products.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -16,11 +16,11 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
-    $result = mysqli_query($conn, $sql);
+    $result = mysqli_query($mysqli, $sql);
 
     if (mysqli_num_rows($result) == 1) {
         $_SESSION['user'] = $username;
-        header("Location: products.php");
+        header("Location: index.php");
         exit();
     } else {
         $error = "Invalid username or password!";
