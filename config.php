@@ -1,4 +1,4 @@
-<?php
+<?php //bitti
 $host = "localhost";
 $user = "root";
 $pass = "";

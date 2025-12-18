@@ -1,7 +1,7 @@
-<?php
+<?php //html css gelince php onlara baglanicak genel kullanim hazir
 session_start();
 include "config.php";
-echo "index calisiyor<br>";
+//echo "index calisiyor<br>";
 
 if (isset($_SESSION['username'])) {
     header("Location: products.php");

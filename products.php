@@ -1,4 +1,4 @@
-<?php
+<?php //products sayfasi duzenlenicek
 include "Config.php";
 
 /* GET VALUES */
@@ -36,6 +36,7 @@ $result = $mysqli->query($sql);
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<a href="logout.php">Çıkış Yap</a>
 
 <h2>Çocuk Ürünleri</h2>
 
