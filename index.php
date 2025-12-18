@@ -3,8 +3,8 @@ session_start();
 include "config.php";
 echo "index calisiyor<br>";
 
-if (isset($_SESSION['user'])) {
-    header("Location: index.php");
+if (isset($_SESSION['username'])) {
+    header("Location: products.php");
     exit();
 }
 
@@ -19,8 +19,8 @@ if (isset($_POST['login'])) {
     $result = mysqli_query($mysqli, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        $_SESSION['user'] = $username;
-        header("Location: index.php");
+        $_SESSION['username'] = $username;
+        header("Location: products.php");
         exit();
     } else {
         $error = "Invalid username or password!";
