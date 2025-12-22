@@ -1,0 +1,491 @@
+*{
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    text-decoration-line: none;
+    font-family: Jost;
+}
+.container{
+    max-width: 1400px;
+    margin: auto;
+}
+.navbar{
+    /*padding: 10px;*/
+    height: auto;
+    border-bottom:1px solid #ccc;
+}
+
+.topnav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 80px;
+}
+.topnav img{
+    padding: 0 10px;
+}
+.topnav ul {
+    display: flex;
+}
+.topnav ul li {
+    padding:0 10px ;
+    font-size: 25px;
+    font-weight: 200;
+}
+
+.topnav .searchbar{
+    display: flex;
+    width: 48%;
+    padding: 14px;
+    margin:0px; 
+    font-size:14px;
+    font-weight: 400;
+    line-height: 20px;
+    border:1px solid #ccc;
+    transition: border 180ms ease-in-out;
+
+}
+
+.ince-yap {
+    color: transparent; /* İkonun kendi rengini yok et */
+    -webkit-text-stroke: 1px #333; /* Etrafına 1px ince çizgi çek */
+    /* Not: 1px yerine 0.5px yazarsan daha da ince olur */
+    opacity: 0.7;
+}
+
+.topnav input{
+    margin:0px 10px;
+    width: 50%;
+    height: 20px;
+    font-size:14px;
+    font-weight: 400;
+    line-height: 20px;
+    border:none;
+
+}
+.topnav input:focus{
+    outline:none;
+}
+.topnav .searchbar:hover{
+    border:1px solid #0e0e0e;
+}
+.bottomnav{
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 80px;
+    z-index: 999;
+}
+.bottomnav a{
+    font-size: 14px;
+    color: #000;
+    font-weight: 420;
+    line-height: 20px;
+    padding: 20px 0;
+}
+.bottomnav #campains{
+    color: red;
+}
+.cloud_links{
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+.cloud_links a {
+    color: #2b2b38;
+    font-size: 14px;
+    line-height: 20px;
+    display: flex;
+    min-width: 16.6%;
+    margin-bottom: 6px;
+}
+.links{
+    border-bottom: 1px solid #ccc;
+    border-top:1px solid #ccc;
+    padding: 48px 0;
+}
+.links h2{
+    color: #2B2B38  ;
+    font-size: 20px;
+    font-weight: 540;
+    line-height: 28px;
+}
+.world {
+    padding: 24px 0;
+}
+.footer .world p{
+    font-size: 14px;
+    font-weight: 350;
+}
+.b-icon {
+    font-family: 'boyner-ui-kit-icons';
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Kullanılan İkonların Kodları */
+.b-icon--receive-package-light:before { content: "\ea3a"; }
+.b-icon--delivery2-light:before { content: "\e9b4"; }
+.b-icon--creditcard-light:before { content: "\e9ac"; }
+.b-icon--store-light:before { content: "\ea6c"; }
+.b-icon--quality-light:before { content: "\ea34"; }
+.b-icon--info-light:before { content: "\e9ee"; }
+
+/* --- Footer Slider (Marquee) Yapısı --- */
+.footer-slider_footerSlider__iKZ_E {
+    border-top: 1px solid #ccc;
+    border-bottom:1px solid #ccc;
+    padding: var(--spacing-32) 0;
+    min-height: 80px;
+    background-color: var(--semantic-background-primary);
+    overflow: hidden; /* Taşmaları gizle */
+    display: flex;
+}
+
+/* Kayar Yazı Konteynerleri */
+.rfm-marquee-container {
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    width: 100%;
+}
+
+.rfm-marquee {
+    flex: 0 0 auto;
+    min-width: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    animation: scroll 35s linear infinite; /* Kayma animasyonu */
+}
+
+.rfm-initial-child-container {
+    flex: 0 0 auto;
+    display: flex;
+    min-width: 100%;
+    flex-direction: row;
+    align-items: center;
+}
+
+.rfm-child {
+    transform: translateZ(0);
+}
+
+/* Animasyon Tanımı */
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+/* --- İçerik Öğeleri --- */
+.footer-slider_footerSliderItem__2i_Sh {
+    display: flex;
+    align-items: center;
+    color: #000;
+    padding: 0 24px;
+    white-space: nowrap; /* Metinlerin alt satıra geçmesini engeller */
+}
+
+.footer-slider_footerSliderItemIcon___V2N7 {
+    margin-right: 20px; /* İkon ile yazı arası boşluk */
+    font-size: 24px;
+}
+
+/* Resim İkonlar için Ayar */
+img.footer-slider_footerSliderItemIcon___V2N7 {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Tipografi */
+.b-typography {
+    margin: 0;
+    font-family: 'Jost', sans-serif;
+    color: inherit;
+}
+
+.b-typography--h6 {
+    color: #2B2B38;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Bilgi Butonu (i ikonu) */
+.footer-slider_footerSliderItemInfo__0NryY {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 20px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    color: var(--semantic-foreground-secondary);
+}
+
+.footer-slider_footerSliderItemInfo__0NryY:hover {
+    color: #000;
+}
+
+
+.footer-menus_footerMenu__gK6yj {
+    padding: 60px 0;
+    border-top: 1px solid #e5e5e5;
+    background-color: #ffffff;
+    font-size: 14px;
+    width: 100%;
+    overflow-x: hidden; /* Yanlardan taşmayı engeller */
+}
+
+.b-grid--container {
+    max-width: 1240px; /* İçerik genişliği */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- 3. Grid Sistemi (5'li Kolon Yapısı) --- */
+.b-grid--row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -15px;
+    margin-right: -15px;
+    justify-content: space-between; /* Kolonları eşit dağıt */
+}
+
+.b-grid--col-2 {
+    /* Masaüstünde 5 kolon yan yana */
+    flex: 0 0 20%;
+    max-width: 20%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 30px;
+}
+
+/* --- 4. Başlıklar --- */
+.footer-menus_footerMenuItemChildTitle__fIHs1 h5,
+.footer-menus_footerMenuItemChildLinkTitle__8D1lz h5 {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #2b2b38;
+    text-transform: uppercase;
+    margin: 0 0 20px 0; /* Alt boşluk */
+    letter-spacing: 0.5px;
+}
+
+/* --- 5. Linkler ve Metinler --- */
+.footer-menus_footerMenuItemChildMenu__v_Qoz {
+    margin-bottom: 12px;
+}
+
+.footer-menus_footerMenuItemChildMenu__v_Qoz a,
+.footer-menus_footerMenuItemChildLinkTitle__8D1lz a {
+    text-decoration: none;
+    color: #515151;
+    display: block; /* Tıklama alanını genişletir */
+    transition: color 0.2s ease;
+}
+
+.b-typography--p16 {
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Hover Efekti */
+.footer-menus_footerMenuItemChildMenu__v_Qoz a:hover,
+.footer-menus_footerMenuItemChildLinkTitle__8D1lz a:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+/* Alt kısımdaki (Yardım vb.) başlıkları yukarıdan ayır */
+.footer-menus_footerMenuItemChildLinkTitle__8D1lz {
+    margin-top: 30px;
+}
+
+/* --- 6. İkonlar ve Resimler --- */
+
+/* Sosyal Medya İkonları */
+.footer-menus_footerMenuItemChildSocialMedia__dR1FH {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.footer-menus_footerMenuItemChildSocialMedia__dR1FH i {
+    font-size: 22px;
+    color: #2b2b38;
+    cursor: pointer;
+}
+
+/* App Store / Google Play Resimleri */
+.footer-menus_footerMenuItemChild__XB_b_ {
+    margin-bottom: 10px;
+}
+
+.footer-menus_footerMenuItemChild__XB_b_ img {
+    max-width: 140px; /* Resimlerin çok büyük olmasını engeller */
+    height: auto;
+    display: block;
+}
+
+/* ETBIS ve Güven Damgası logoları için özel ayar */
+.footer-menus_footerMenuItemChild__XB_b_ a[href*="eticaret.gov.tr"] img,
+.footer-menus_footerMenuItemChild__XB_b_ a[href*="guvendamgasi.org.tr"] img {
+    max-width: 80px; /* Bu logolar daha küçük durmalı */
+}
+
+
+/* --- 7. Responsive (Mobil/Tablet) Ayarları --- */
+
+/* Tablet (1024px altı) -> 3 Kolon */
+@media (max-width: 1024px) {
+    .b-grid--col-2 {
+        flex: 0 0 33.33%;
+        max-width: 33.33%;
+    }
+}
+
+/* Küçük Tablet / Büyük Telefon (768px altı) -> 2 Kolon */
+@media (max-width: 768px) {
+    .b-grid--col-2 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+/* Mobil (480px altı) -> Tek Kolon */
+@media (max-width: 480px) {
+    .b-grid--col-2 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        border-bottom: 1px solid #f0f0f0; /* Mobilde bölümleri çizgiyle ayır */
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* Son elemanın alt çizgisini kaldır */
+    .b-grid--col-2:last-child {
+        border-bottom: none;
+    }
+}
+
+.footer-bottom_footerBottom__fpW9_ {
+    background-color: #ffffff;
+    border-top: 1px solid #e5e5e5; /* Üstteki ince gri çizgi */
+    padding: 20px 0;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    width: 100%;
+}
+
+/* --- Kapsayıcı --- */
+.footer-bottom_footerBottomContainerWrapper__N3tx5 {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Satır Düzeni (Flexbox) --- */
+.footer-bottom_footerBottomContainer__Z3kuT {
+    display: flex;
+    justify-content: space-between; /* Sol ve Sağ tarafı uzaklaştır */
+    align-items: center; /* Dikeyde ortala */
+    flex-wrap: wrap;
+}
+
+/* --- SOL TARAF: Logo ve Telif Yazısı --- */
+.footer-bottom_footerBottomContainerBox__8d0Ua {
+    display: flex;
+    align-items: center;
+}
+
+/* Boyner Grup Logosu */
+.footer-bottom_footerBottomContainerBoxLogo__cNIgu img {
+    height: 26px;
+    width: auto;
+    display: block;
+    margin-right: 24px; /* Logo ile yazı arasındaki boşluk */
+}
+
+/* Telif Hakkı Yazısı (© 2025...) */
+.footer-bottom_footerBottomContainerBoxText__lDc1f {
+    color: #2b2b38; /* Koyu renk */
+    margin: 0;
+    white-space: nowrap; /* Yazının alt satıra kaymasını engelle */
+}
+
+/* --- SAĞ TARAF: Linkler (Üyelik Sözleşmesi vb.) --- */
+.footer-bottom_footerBottomContainerItems__eLiV4 {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Linkler arası boşluk */
+}
+
+/* Link Stilleri */
+.footer-bottom_footerBottomContainerItemsText__Xizz9 {
+    text-decoration: none;
+}
+
+.footer-bottom_footerBottomContainerItemsText__Xizz9 p {
+    margin: 0;
+    color: #515151; /* Gri renk */
+    transition: color 0.2s ease;
+}
+
+/* Link Hover Efekti */
+.footer-bottom_footerBottomContainerItemsText__Xizz9:hover p {
+    color: #000000;
+    text-decoration: underline;
+}
+
+/* --- MOBİL UYUMLULUK (Responsive) --- */
+@media (max-width: 992px) {
+    /* Mobilde ve Tablette alt alta al */
+    .footer-bottom_footerBottomContainer__Z3kuT {
+        flex-direction: column-reverse; /* Linkleri üste, logoyu alta al (Boyner stili) */
+        gap: 20px;
+    }
+
+    /* Linkler Bölümü */
+    .footer-bottom_footerBottomContainerItems__eLiV4 {
+        flex-direction: column; /* Linkleri alt alta diz */
+        gap: 15px;
+        text-align: center;
+        width: 100%;
+    }
+
+    /* Sol Taraf (Logo + Copyright) */
+    .footer-bottom_footerBottomContainerBox__8d0Ua {
+        flex-direction: column; /* Logo ve yazıyı alt alta diz */
+        width: 100%;
+        border-top: 1px solid #f0f0f0; /* Mobilde araya çizgi at */
+        padding-top: 20px;
+        margin-top: 10px;
+    }
+
+    /* Logo hizalaması */
+    .footer-bottom_footerBottomContainerBoxLogo__cNIgu img {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    /* Telif yazısı mobilde sığması için */
+    .footer-bottom_footerBottomContainerBoxText__lDc1f {
+        white-space: normal;
+        text-align: center;
+        font-size: 12px;
+        color: #999;
+    }
+}
