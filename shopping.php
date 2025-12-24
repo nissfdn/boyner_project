@@ -7,7 +7,7 @@ $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Ürün detaylarını veritabanından çek
 $query = "SELECT * FROM products WHERE id = $product_id";
-$result = mysqli_query($conn, $query);
+$result = mysqli_query($mysqli, $query);
 $product = mysqli_fetch_assoc($result);
 
 // Ürün bulunamazsa ana listeye geri dön
@@ -76,6 +76,9 @@ if (!$product) {
             </div>
           </div>
         
+
+
+          
           <div class="addBasket"  style="display: none;">
             <div class="">
                 <img src="https://statics-mp.boyner.com.tr/mnresize/1100/-/Boynerimages/5003271456_303_20250729121728552.jpg?v=1753781005" alt="">
@@ -135,6 +138,9 @@ if (!$product) {
 
         </div>
     </div>
+
+
+
 
     <div class="footer">
         <div class="container">
