@@ -1,3 +1,21 @@
+<?php
+session_start(); // Oturum yönetimi için şart
+include 'config.php'; // Veritabanı bağlantısı
+
+// URL'den ürün ID'sini al (id parametresi yoksa products.php'ye yönlendir)
+$product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+// Ürün detaylarını veritabanından çek
+$query = "SELECT * FROM products WHERE id = $product_id";
+$result = mysqli_query($conn, $query);
+$product = mysqli_fetch_assoc($result);
+
+// Ürün bulunamazsa ana listeye geri dön
+if (!$product) {
+    header("Location: products.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
