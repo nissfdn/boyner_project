@@ -79,67 +79,71 @@ if (!$product) {
 
 
           
-          <div class="addBasket"  style="display: none;">
-            <div class="">
-                <img src="https://statics-mp.boyner.com.tr/mnresize/1100/-/Boynerimages/5003271456_303_20250729121728552.jpg?v=1753781005" alt="">
-            </div>
-            <div class="">
-                <h1>Ürün sepete eklendi.</h1>
-                <!---->
-                <img src="" alt="">
-            </div>
+        <div class="addBasket" style="display: none;">
+    <div class="">
+        <img src="images/<?= $product['image'] ?>" alt="">
+    </div>
+    <div class="">
+        <h1>Ürün sepete eklendi.</h1>
+        <img src="images/<?= $product['image'] ?>" alt="">
+    </div>
+</div>
 
-          </div>
-
-
-          <div class="content" >
-            <div class="images">
-                <img src="https://statics-mp.boyner.com.tr/mnresize/1100/-/Boynerimages/5003271456_303_20250729121728552.jpg?v=1753781005" alt="big picture">
-                <img src="https://statics-mp.boyner.com.tr/mnresize/505/704/Boynerimages/5003271456_303_20250729121727576.jpg?v=1753781005" alt="little picture" style="width: 50%;">
-            </div>
-            <div class="infos">
-                <h1 style="font-size: 24px;"><strong>Discovery Expedition</strong> Yeşil Erkek Çocuk Baskılı Sweatshirt D5WB-SWT3044</h1>
-                <p>Satıcı : BOYNER</p>
-                <h2 style="font-size: 24px; font-weight: bold;"> 1.149 TL</h2>
-                <div class="Rate">
-                    <i class="b-icon b-icon--star-full" style="color: var(--semantic-foreground-inverse-secondary); font-size: 24px;"></i>
-                    <p style="padding: 0 10px;">Henüz değerlendirilmemiş</p>
-                </div>
-                <div class="size">
-                    <form action="">
-                        <label for="sizes">Beden</label>
-                        <select name="sizes" id="sizes">
-                            <option value="">seç</option>
-                            <option value="5-6">5-6 yaş</option>
-                            <option value="7-8">7-8 yaş</option>
-                            <option value="9-10">9-10 yaş</option>
-                            <option value="11-12">11-12 yaş</option>
-                        </select>
-                        <input type="button" value="SEPETE EKLE" id="add">
-                    </form>
-                </div>
-
-                <div>
-                    <div class="detail-infoBox_detailInfo__1AtL7"><div class="detail-infoBox_detailInfoDelivery__7BqkL"><div class="delivery-time_deliveryTime__tYTGa"><i class="b-icon b-icon--delivery1-light delivery-time_deliveryTimeIcon__Edq84" style="font-size: 32px;"></i><div class="delivery-time_deliveryTimeTextContent__YF0hE"><div class="delivery-time_deliveryTimeTextContentHeader__FCEvI"><h6 class="b-typography b-typography--h6 delivery-time_deliveryTimeTextContentType__S4pb_" style="color: rgb(43, 43, 56);">Standart Teslimat</h6><div class="delivery-time_deliveryTimeIsFree__XjVKQ"></div></div><p class="b-typography b-typography--p14">Tahmini 24 Aralık Çarşamba Kargoda</p></div></div></div><div class="detail-infoBox_detailInfoBenefits__aSybF"><div class="benefits_benefits__XT7Kw"><i class="b-icon b-icon--receive-package-light" style="font-size: 24px;"></i><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">Dilediğin Zaman, Mağazadan veya Kargo ile İade</p></div><div class="benefits_benefits__XT7Kw"><i class="b-icon b-icon--store-light" style="font-size: 24px;"></i><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">Mağazadan Değişim</p></div><div class="benefits_benefits__XT7Kw"><img alt="logo" loading="lazy" width="24" height="24" decoding="async" data-nimg="1" src="https://boyner-stook-frontend.mncdn.com/public/footer/tiklagel.png" style="color: transparent;"><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">Tıkla Gel ile Mağazadan Teslim Alınabilir<button class="b-button b-button--base b-button--medium b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false"><i class="b-icon b-icon--info-medium b-button__icon" style="color: var(--semantic-foreground-secondary); font-size: 16px;"></i></button></p></div><div class="benefits_benefits__XT7Kw"><i class="b-icon b-icon--quality-boyner-light" style="font-size: 24px;"></i><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">%100 Orijinal Ürün Garantisi<div class="b-tooltip" aria-describedby="tooltip-text"><button class="b-button b-button--base b-button--medium b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false"><i class="b-icon b-icon--info-medium b-button__icon" style="color: var(--semantic-foreground-secondary); font-size: 16px;"></i></button><div class="b-tooltip__box b-tooltip__box--bottom b-tooltip__box--bottom-center" aria-hidden="true" role="tooltip" id="tooltip-text"><div class="b-tooltip__box-arrow"></div><div class="b-tooltip__box-content"><p class="b-typography b-typography--p14">Bize duyduğun güven birinci önceliğimiz. Ürünleri resmi tedarikçilerinden alarak %100 orijinal ürün garantisi ile seninle buluşturuyoruz.</p></div></div></div></p></div></div></div></div>
-                
-                <div><h4 class="b-typography b-typography--h4">Ürün Bilgileri</h4><div class="product-info-widget_productInfoWidgetBadgeWrapper__ZWBT9"><div class="product-value_productValue__KC2Sx product-value_productValueMedium__AAVmJ product-value_productValueWithLabel__DREmu"><p class="b-typography b-typography--p14 product-value_productValueWithLabelText__it7_t" style="color: var(--semantic-foreground-secondary);">Cep Bilgisi</p><h6 class="b-typography b-typography--h6">Cepsiz</h6></div><div class="product-value_productValue__KC2Sx product-value_productValueMedium__AAVmJ product-value_productValueWithLabel__DREmu"><p class="b-typography b-typography--p14 product-value_productValueWithLabelText__it7_t" style="color: var(--semantic-foreground-secondary);">Desen</p><h6 class="b-typography b-typography--h6">Baskılı</h6></div><div class="product-value_productValue__KC2Sx product-value_productValueMedium__AAVmJ product-value_productValueWithLabel__DREmu"><p class="b-typography b-typography--p14 product-value_productValueWithLabelText__it7_t" style="color: var(--semantic-foreground-secondary);">Kalıp Bilgisi</p><h6 class="b-typography b-typography--h6">Relaxed</h6></div><div class="product-value_productValue__KC2Sx product-value_productValueMedium__AAVmJ product-value_productValueWithLabel__DREmu"><p class="b-typography b-typography--p14 product-value_productValueWithLabelText__it7_t" style="color: var(--semantic-foreground-secondary);">Kol Bilgisi</p><h6 class="b-typography b-typography--h6">Uzun</h6></div></div><div class="product-info-widget_productInfoWidgetDescription__76Qsj"><p class="b-typography b-typography--p16">Enerjik bir görünüm sunan Discovery Expedition ekru erkek çocuk baskılı sweatshirt, gençlerin stiline modern bir dokunuş katıyor. Bisiklet yaka tasarımı ve uzun kolları ile rahat bir kullanım imkanı sağlayan bu sweatshirt, relaxed kalıbı sayesinde hareket özgürlüğü tanır. Krem rengi, her türlü kombinle uyum sağlarken; üzerindeki dinamik baskılar ise dikkat çekici bir detay oluşturuyor.
-
-                    Bu şık parça, günlük aktivitelerde veya arkadaş buluşmalarında tercih edilebilir. Jean pantolonlar ya da spor şortlarla mükemmel uyum sağlar; altına beyaz spor ayakkabılarla tamamlayarak enerjik ve rahat bir görünüm elde edebilirsiniz. Ayrıca yaz akşamlarında hafif serin havalarda üzerine alacağınız ince bomber ceketlerle de harika görünecektir.
-                    
-                    Çocukların aktif yaşam tarzlarına uygun olarak tasarlanan bu sweatshirt, hem konforu hem de estetiği ön planda tutuyor. Farklı aksesuarlarla zenginleştirerek kişisel stillerini yansıtabilirler; örneğin renkli bileklikler veya eğlenceli şapka seçimleriyle kombininizi tamamlayabilirsiniz.
-                    
-                    Keşfetmeye hazır olan küçük maceraperestlere hitap eden bu ürün için doğru zaman şimdi! Onlara stil dolu anlar yaşatmak için hemen satın alın!</p><div class="product-info-widget_productInfoWidgetDescriptionOverlay__F1XkQ"></div></div><button class="b-button b-button--secondary b-button--xsmall b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false" aria-label="DEVAMINI OKU" style="width: 135px; height: 48px;"><span class="b-typography b-typography--h6 b-typography--ellipsis" style="display: -webkit-box; 
-    -webkit-line-clamp: 1; 
-    line-clamp: 1; 
-    -webkit-box-orient: vertical; 
-    overflow: hidden;">DEVAMINI OKU</span></button></div>
-
-            </div>
-
-        </div>
+<div class="content">
+    <div class="images">
+        <img src="images/<?= $product['image'] ?>" alt="big picture">
+        <img src="images/<?= $product['image'] ?>" alt="little picture" style="width: 50%;">
     </div>
 
+    <div class="infos">
+        <h1 style="font-size: 24px;">
+            <strong><?= $product['brand'] ?></strong>
+            <?= $product['name'] ?>
+        </h1>
 
+        <p>Satıcı : BOYNER</p>
+
+        <h2 style="font-size: 24px; font-weight: bold;">
+            <?= number_format($product['price'], 2) ?> TL
+        </h2>
+
+        <div class="Rate">
+            <i class="b-icon b-icon--star-full" style="color: var(--semantic-foreground-inverse-secondary); font-size: 24px;"></i>
+            <p style="padding: 0 10px;">Henüz değerlendirilmemiş</p>
+        </div>
+
+        <div class="size">
+            <form action="">
+                <label for="sizes">Beden</label>
+                <select name="sizes" id="sizes">
+                    <option value="">seç</option>
+                    <option value="5-6">5-6 yaş</option>
+                    <option value="7-8">7-8 yaş</option>
+                    <option value="9-10">9-10 yaş</option>
+                    <option value="11-12">11-12 yaş</option>
+                </select>
+                <input type="button" value="SEPETE EKLE" id="add">
+            </form>
+        </div>
+
+        <div>
+            <h4 class="b-typography b-typography--h4">Ürün Bilgileri</h4>
+
+            <div class="product-info-widget_productInfoWidgetDescription__76Qsj">
+                <p class="b-typography b-typography--p16">
+                    <?= nl2br($product['description']) ?>
+                </p>
+                <div class="product-info-widget_productInfoWidgetDescriptionOverlay__F1XkQ"></div>
+            </div>
+
+            <button class="b-button b-button--secondary b-button--xsmall b-button--text-style-heading"
+                type="button"
+                style="width: 135px; height: 48px;">
+                DEVAMINI OKU
+            </button>
+        </div>
+    </div>
+</div>
 
 
     <div class="footer">
