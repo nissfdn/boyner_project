@@ -81,7 +81,7 @@ if (!$product) {
  <?php
 $productId = $product['id'];
 
-$sql = $db->prepare("
+$sql = $boyner_project->prepare("
     SELECT size, color, image 
     FROM product_variants 
     WHERE product_id = ?
