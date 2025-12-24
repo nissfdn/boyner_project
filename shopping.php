@@ -79,15 +79,16 @@ if (!$product) {
 
 
  <?php
-$productId = $product['id'];
-
-$sql = $boyner_project->prepare("
+$stmt = $mysqli->prepare("
     SELECT size, color, image 
     FROM product_variants 
     WHERE product_id = ?
 ");
-$sql->execute([$productId]);
-$variants = $sql->fetchAll(PDO::FETCH_ASSOC);
+$stmt->bind_param("i", $product_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$variants = $result->fetch_all(MYSQLI_ASSOC);
 
 $sizes  = [];
 $colors = [];
@@ -102,6 +103,7 @@ foreach ($variants as $v) {
 
 $sizes = array_keys($sizes);
 ?>
+
 
 <div class="addBasket" style="display: none;">
     <div>
