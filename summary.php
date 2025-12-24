@@ -3,32 +3,57 @@ session_start();
 
 /* 🔗 MYSQLI BAĞLANTISI */
 $mysqli = new mysqli("localhost", "root", "", "boyner_project");
-
 if ($mysqli->connect_error) {
     die("Veritabanı bağlantı hatası: " . $mysqli->connect_error);
 }
 
-/* SEPET OLUŞTUR */
-if (!isset($_SESSION['cart'])) {
+/* 🛒 SEPETİ OLUŞTUR */
+if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-/* SEPETE EKLE */
+/* ➕ SEPETE EKLE */
 if (isset($_POST['add_to_cart'])) {
 
-    $item = [
-        'name'     => $_POST['name'],
-        'price'    => $_POST['price'],
-        'image'    => $_POST['image'],
-        'size'     => $_POST['size'] ?? '',
-        'color'    => $_POST['color'] ?? '',
-        'quantity' => 1
-    ];
+    $name  = $_POST['name']  ?? '';
+    $price = (float)($_POST['price'] ?? 0);
+    $image = $_POST['image'] ?? '';
+    $size  = $_POST['size']  ?? '';
+    $color = $_POST['color'] ?? '';
 
-    $_SESSION['cart'][] = $item;
+    if ($name !== '' && $price > 0) {
+
+        $found = false;
+
+        // aynı ürün + renk + beden varsa adet artır
+        foreach ($_SESSION['cart'] as &$cartItem) {
+            if (
+                $cartItem['name']  === $name &&
+                $cartItem['color'] === $color &&
+                $cartItem['size']  === $size
+            ) {
+                $cartItem['quantity']++;
+                $found = true;
+                break;
+            }
+        }
+        unset($cartItem);
+
+        // yoksa yeni ürün ekle
+        if (!$found) {
+            $_SESSION['cart'][] = [
+                'name'     => $name,
+                'price'    => $price,
+                'image'    => $image,
+                'size'     => $size,
+                'color'    => $color,
+                'quantity' => 1
+            ];
+        }
+    }
 }
 
-/* ADET ARTIR */
+/* ➕ ADET ARTIR */
 if (isset($_GET['inc'])) {
     $i = (int)$_GET['inc'];
     if (isset($_SESSION['cart'][$i])) {
@@ -36,7 +61,7 @@ if (isset($_GET['inc'])) {
     }
 }
 
-/* ADET AZALT */
+/* ➖ ADET AZALT */
 if (isset($_GET['dec'])) {
     $i = (int)$_GET['dec'];
     if (isset($_SESSION['cart'][$i]) && $_SESSION['cart'][$i]['quantity'] > 1) {
@@ -44,7 +69,7 @@ if (isset($_GET['dec'])) {
     }
 }
 
-/* ÜRÜN SİL */
+/* ❌ ÜRÜN SİL */
 if (isset($_GET['del'])) {
     $i = (int)$_GET['del'];
     if (isset($_SESSION['cart'][$i])) {
@@ -53,12 +78,13 @@ if (isset($_GET['del'])) {
     }
 }
 
-/* TOPLAM */
+/* 💰 TOPLAM HESAPLA */
 $total = 0;
 foreach ($_SESSION['cart'] as $item) {
     $total += $item['price'] * $item['quantity'];
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -135,7 +161,13 @@ foreach ($_SESSION['cart'] as $item) {
                                         <span style="box-sizing: border-box; display: block; overflow: hidden; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px; position: absolute; inset: 0px;">
                                           
                                           <!--image-->
-                                          <img alt="" src="images/<?= $product['image'] ?>"decoding="async" data-nimg="fill" style="position: absolute; inset: 0px; box-sizing: border-box; padding: 0px; border: none; margin: auto; display: block; width: 0px; height: 0px; min-width: 100%; max-width: 100%; min-height: 100%; max-height: 100%; object-fit: cover;">
+                                          <img 
+  id="mainProductImage"
+  src="/images/products/<?= htmlspecialchars($product['image']) ?>"
+  alt="<?= htmlspecialchars($product['name']) ?>"
+  style="width:100%; height:100%; object-fit:cover;"
+>
+
                                           
                                           
                                             <noscript></noscript>
@@ -146,6 +178,7 @@ foreach ($_SESSION['cart'] as $item) {
                             </div>
     
                             <div class="cart-product-desktop_cartProductDetail__OpOLd">
+                                
                                 <div class="cart-product-desktop_cartProductDetailBox__qClDi cart-product-desktop_cartProductDetailItem__LnYFZ">
                                     
                                     <div class="product-info_productInfo__Tox6W product-info_productInfoLarge__1AM91 cart-product-desktop_cartProductDetailBoxItem__PFBxR">
@@ -209,7 +242,26 @@ foreach ($_SESSION['cart'] as $item) {
                                         </button>
                                     </div>
                                 </div>
-    
+    <div class="product-colors" style="margin-top:10px;">
+  <?php foreach ($colors as $color): ?>
+    <button 
+      class="color-btn"
+      data-image="<?= $color['image'] 
+        ? '/images/products/'.$color['image'] 
+        : '/images/products/'.$product['image'] ?>"
+      title="<?= $color['color'] ?>"
+      style="
+        width:24px;
+        height:24px;
+        border-radius:50%;
+        border:1px solid #ccc;
+        margin-right:6px;
+        cursor:pointer;
+      "
+    ></button>
+  <?php endforeach; ?>
+</div>
+
                                 <div class="price_priceLeft__VRQGR cart-product-desktop_cartProductDetailItem__LnYFZ cart-product-desktop_cartProductDetailItemPrice__x5fVm">
                                     <div class="price_priceGroupLayer__Xrinc">
                                         <p class="b-typography b-typography--p14 price_priceOldPrice__FM_Do b-typography--ellipsis" style="-webkit-line-clamp: 1;">3.298 TL</p>&nbsp;
@@ -344,6 +396,14 @@ foreach ($_SESSION['cart'] as $item) {
     </div>
 
     </div>
+<script>
+  document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const newImage = this.getAttribute('data-image');
+      document.getElementById('mainProductImage').src = newImage;
+    });
+  });
+</script>
 
 
 
