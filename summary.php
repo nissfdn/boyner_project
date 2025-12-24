@@ -1,3 +1,65 @@
+<?php
+session_start();
+
+/* 🔗 MYSQLI BAĞLANTISI */
+$mysqli = new mysqli("localhost", "root", "", "boyner_project");
+
+if ($mysqli->connect_error) {
+    die("Veritabanı bağlantı hatası: " . $mysqli->connect_error);
+}
+
+/* SEPET OLUŞTUR */
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+/* SEPETE EKLE */
+if (isset($_POST['add_to_cart'])) {
+
+    $item = [
+        'name'     => $_POST['name'],
+        'price'    => $_POST['price'],
+        'image'    => $_POST['image'],
+        'size'     => $_POST['size'] ?? '',
+        'color'    => $_POST['color'] ?? '',
+        'quantity' => 1
+    ];
+
+    $_SESSION['cart'][] = $item;
+}
+
+/* ADET ARTIR */
+if (isset($_GET['inc'])) {
+    $i = (int)$_GET['inc'];
+    if (isset($_SESSION['cart'][$i])) {
+        $_SESSION['cart'][$i]['quantity']++;
+    }
+}
+
+/* ADET AZALT */
+if (isset($_GET['dec'])) {
+    $i = (int)$_GET['dec'];
+    if (isset($_SESSION['cart'][$i]) && $_SESSION['cart'][$i]['quantity'] > 1) {
+        $_SESSION['cart'][$i]['quantity']--;
+    }
+}
+
+/* ÜRÜN SİL */
+if (isset($_GET['del'])) {
+    $i = (int)$_GET['del'];
+    if (isset($_SESSION['cart'][$i])) {
+        unset($_SESSION['cart'][$i]);
+        $_SESSION['cart'] = array_values($_SESSION['cart']);
+    }
+}
+
+/* TOPLAM */
+$total = 0;
+foreach ($_SESSION['cart'] as $item) {
+    $total += $item['price'] * $item['quantity'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +135,7 @@
                                         <span style="box-sizing: border-box; display: block; overflow: hidden; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px; position: absolute; inset: 0px;">
                                           
                                           <!--image-->
-                                          <img alt="" src="https://statics-mp.boyner.com.tr/mnresize/155/-/Boynerimages/5003271455_271_20250905133658897.jpg?v=1757068751" decoding="async" data-nimg="fill" style="position: absolute; inset: 0px; box-sizing: border-box; padding: 0px; border: none; margin: auto; display: block; width: 0px; height: 0px; min-width: 100%; max-width: 100%; min-height: 100%; max-height: 100%; object-fit: cover;">
+                                          <img alt="" src="images/<?= $product['image'] ?>"decoding="async" data-nimg="fill" style="position: absolute; inset: 0px; box-sizing: border-box; padding: 0px; border: none; margin: auto; display: block; width: 0px; height: 0px; min-width: 100%; max-width: 100%; min-height: 100%; max-height: 100%; object-fit: cover;">
                                           
                                           
                                             <noscript></noscript>
@@ -91,7 +153,7 @@
                                             <div class="product-info_productInfoBoxTextWrapper__7XZCM">
                                                 <a class="product-info_productInfoBoxTextWrapperTitle__CpqOs" href="/discovery-expedition-ekru-erkek-cocuk-baskili-sweatshirt-d5wb-swt3042-p-15625115" style="text-decoration: none;">
                                                     <p class="b-typography b-typography--p16 b-typography--ellipsis b-typography--ellipsis-lines" style="-webkit-line-clamp: 2;">
-                                                    <!-- ürün ismi -->    <b>Discovery Expedition</b> Discovery Expedition Ekru Erkek Çocuk Baskılı Sweatshirt D5WB-SWT3042
+                                                    <b><?= $product['brand'] ?></b> <?= $product['name'] ?>
                                                     </p>
                                                 </a>
                                             </div>
@@ -152,8 +214,9 @@
                                     <div class="price_priceGroupLayer__Xrinc">
                                         <p class="b-typography b-typography--p14 price_priceOldPrice__FM_Do b-typography--ellipsis" style="-webkit-line-clamp: 1;">3.298 TL</p>&nbsp;
                                     </div>
-                                    <h5 class="b-typography b-typography--h5 price_priceMain__DrVVQ b-typography--ellipsis" style="-webkit-line-clamp: 1;">1.739,90 TL</h5>
-                                </div>
+                                     <h5 class="b-typography b-typography--h5 price_priceMain__DrVVQ b-typography--ellipsis" style="-webkit-line-clamp: 1;"> <?= number_format($product['price'], 2, ',', '.') ?> TL
+</h5>
+
     
                                 <div class="favorite_favorite__eM4RC">
                                     <button class="b-button b-button--base b-button--medium b-button--text-style-heading favorite_favoriteButton__7JTcw" type="button" aria-disabled="false" aria-busy="false" style="width: 24px; height: 24px;">
@@ -218,7 +281,10 @@
                             <p class="b-typography b-typography--p14" style="color: var(--semantic-foreground-primary);">Sepet Tutarı</p>
                         </div>
                         <div class="cart-order-summary_cartOrderSummaryItemValue__BGvvb">
-                       <!-- Tutar -->     <p class="b-typography b-typography--p14" style="color: var(--semantic-foreground-primary);">1.478,92 TL</p>
+                       <!-- Tutar -->  <p class="b-typography b-typography--p14" style="color: var(--semantic-foreground-primary);">
+    <?= number_format($product['price'], 2, ',', '.') ?> TL
+</p>
+
                         </div>
                     </div>
                     
@@ -229,7 +295,10 @@
                 <div class="cart-order-summary_cartOrderSummaryTotalPriceWrapper__6a5zR">
                 <!-- Total -->
                   <h6 class="b-typography b-typography--h6">Toplam</h6>
-                    <h4 class="b-typography b-typography--h4">1.478,92 TL</h4>
+                    <h4 class="b-typography b-typography--h4">
+    <?= number_format($product['price'], 2, ',', '.') ?> TL
+</h4>
+
                 </div>
     
                 <button class="b-button b-button--primary b-button--large b-button--fluid b-button--icon-position-right b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false" aria-label="SEPETİ ONAYLA">
