@@ -1,21 +1,23 @@
 <?php
+session_start();
 include "Config.php";
 
-$sql = "SELECT * FROM products LIMIT 25";
-$result = $mysqli->query($sql);
-?>
+$sql = "SELECT * FROM products ORDER BY id DESC";
+$result = $mysqli->query($sql); // $mysqli değişkeni config.php'den geliyor
 
-<?php
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-?>
-    
-<?php
-    }
-} else {
-    echo "<p>Ürün bulunamadı.</p>";
+// Sorguda hata var mı kontrol et
+if (!$result) {
+    die("Sorgu Hatası: " . $mysqli->error);
 }
-?>
+
+// Verileri diziye çevir
+// Not: fetch_all komutu verileri toplu çeker.
+$products = $result->fetch_all(MYSQLI_ASSOC);
+
+// --- ÜRÜN SAYISINI HESAPLA ---
+$total_products = $result->num_rows; 
+?> 
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +25,7 @@ if ($result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/boyner.css">
     <link rel="stylesheet" href="css/content.css">
     <link rel="stylesheet" href="css/style.css">
@@ -39,7 +42,19 @@ if ($result->num_rows > 0) {
           </div>
           
           <ul>
-            <li ><i class="far fa-user ince-yap"></i></li>
+            <?php if (isset($_SESSION['username'])): ?>
+        
+        <a href="logout.php" title="Çıkış Yap">
+            <i class="fa-solid fa-right-from-bracket" style="color: red;"></i>
+        </a>
+        
+    <?php else: ?>
+        
+        <a href="#" onclick="document.getElementById('id01').style.display='block'" title="Giriş Yap">
+            <i class="fa-regular fa-user"></i>
+        </a>
+
+    <?php endif; ?>
             <li ><i class="far fa-heart ince-yap"></i></li>
             <li><i class="fas fa-shopping-bag"></i></li>
           </ul>
@@ -143,91 +158,48 @@ if ($result->num_rows > 0) {
                           </div>
                       </div>
                   </div>
+
+
                   <!-- Ürün listesi  -->
+
+                  
                   <div class="b-grid b-grid--col b-grid--col-10">
                       <div class="head_headTitle__nWJBh">
                           <div class="head_headTitleText__JUQz_">
                               <h1 class="b-typography b-typography--h1">Çocuk Üst Giyim Modelleri</h1>
-                              <p class="b-typography b-typography--p16 head_headTitleCount__E8gfq">ürün sayısı yazılacak php ile hesaplanıp</p>
+                              <p class="b-typography b-typography--p16 head_headTitleCount__E8gfq"><?= $total_products ?> ürün listeleniyor</p>
+
                           </div>
                       </div>
                       <div class="head_headItem__2mnPO"><div class=""><div class="b-carousel b-carousel--scroll"><div class="b-carousel__wrapper"><div class="scroll_slider" style="min-width:auto;width:100%"><div class="scroll_slider__wrapper"><div class="scroll_slider__wrapper__outer"><ul class="scroll_slider__wrapper__slides" style="display: flex; flex-direction: row; list-style-type: none; margin: 0px; padding: 0px; transition-duration: 500ms; transform: translate(0px);"><li style="padding-right:3px;padding-left:0px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8 quick-filter_quickFilterItemFirst__Hvwqw"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=erkek-cocuk"><h2 class="b-typography b-typography--h6">Erkek Çocuk</h2></a></div></li><li style="padding-right:3px;padding-left:3px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=kiz-cocuk"><h2 class="b-typography b-typography--h6">Kız Çocuk</h2></a></div></li><li style="padding-right:3px;padding-left:3px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=erkek-bebek"><h2 class="b-typography b-typography--h6">Erkek Bebek</h2></a></div></li><li style="padding-right:3px;padding-left:3px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=kiz-bebek"><h2 class="b-typography b-typography--h6">Kız Bebek</h2></a></div></li><li style="padding-right:3px;padding-left:3px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=unisex-bebek"><h2 class="b-typography b-typography--h6">Unisex Bebek</h2></a></div></li><li style="padding-right:3px;padding-left:3px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=unisex-cocuk"><h2 class="b-typography b-typography--h6">Unisex Çocuk</h2></a></div></li><li style="padding-right:0px;padding-left:3px"><div class="b-carousel__item quick-filter_quickFilterItem__uWZH8"><a style="text-decoration:none" href="/cocuk-ust-giyim-x-c23896247?cinsiyet=erkek"><h2 class="b-typography b-typography--h6">Erkek</h2></a></div></li></ul></div></div></div></div></div></div></div>
                       <section class="styles_products__6uQxI" style="margin-left: 5px;margin-right: 5px;">
                           <div class="b-grid b-grid--row">
                             <!-- Veri tabanından product verileri çekildikten sonra buraya entegre edilecek döngü içindeki html kodu Product-container ve içindekiler olucak -->
+                        
+                            <?php foreach ($products as $product): ?>
+  <div class="product-container">
+    <a href="shopping.php?id=<?= $product['id'] ?>">
+      <div class="product-incontent">
+        <div class="product-image">
+          <img src="/boyner_project/images/<?= rawurlencode($product['image']) ?>" style="width:100%">
 
+        </div>
+        <div class="product-info">
+          <p>
+            <strong><?= $product['brand'] ?></strong>
+            <?= $product['name'] ?>
+          </p>
+          <p>
+            <strong><?= number_format($product['price'], 0, ',', '.') ?> TL</strong>
+          </p>
+          <p style="margin: 15px 0; font-size: 14px;">Kargo bedava</p>
+        </div>
+      </div>
+    </a>
+  </div>
+<?php endforeach; ?>
 
-                            <div class="product-container">
-                              <a href="shopping.html">
-                                <div class="product-incontent">
-                                  <div class="product-image">
-                                    <img src="https://statics-mp.boyner.com.tr/mnresize/325/451/Boynerimages/5003271456_303_20250729121728552.jpg" style="width:100%"/>
-                                  </div>
-                                  <div class="product-info">
-                                    <p><strong>Discovery</strong> Yeşil Erkek Çocuk Baskılı Sweatshirt</p>
-                                    <p><strong>1.449 TL</strong></p>
-                                    <p style="margin: 15px 0; font-size: 14px;">Kargo bedava</p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-
-
-
-
-                            <div class="product-container">
-                              <div class="product-incontent">
-                                <div class="product-image">
-                                  <img src="https://statics-mp.boyner.com.tr/mnresize/325/451/Boynerimages/5003271456_303_20250729121728552.jpg" style="width:100%"/>
-                                </div>
-                                <div class="product-info">
-                                  <p><strong>Discovery</strong> Yeşil Erkek Çocuk Baskılı Sweatshirt</p>
-                                  <p><strong>1.449 TL</strong></p>
-                                  <p style="margin: 15px 0; font-size: 14px;">Kargo bedava</p>
-
-                                </div>
-                              </div>
-                            </div>
-                            <div class="product-container">
-                              <div class="product-incontent">
-                                <div class="product-image">
-                                  <img src="https://statics-mp.boyner.com.tr/mnresize/325/451/Boynerimages/5003271456_303_20250729121728552.jpg" style="width:100%"/>
-                                </div>
-                                <div class="product-info">
-                                  <p><strong>Discovery</strong> Yeşil Erkek Çocuk Baskılı Sweatshirt</p>
-                                  <p><strong>1.449 TL</strong></p>
-                                  <p style="margin: 15px 0; font-size: 14px;">Kargo bedava</p>
-
-                                </div>
-                              </div>
-                            </div>
-                            <div class="product-container">
-                              <div class="product-incontent">
-                                <div class="product-image">
-                                  <img src="https://statics-mp.boyner.com.tr/mnresize/325/451/Boynerimages/5003271456_303_20250729121728552.jpg" style="width:100%"/>
-                                </div>
-                                <div class="product-info">
-                                  <p><strong>Discovery</strong> Yeşil Erkek Çocuk Baskılı Sweatshirt</p>
-                                  <p><strong>1.449 TL</strong></p>
-                                  <p style="margin: 15px 0; font-size: 14px;">Kargo bedava</p>
-
-                                </div>
-                              </div>
-                            </div>
-                            <div class="product-container">
-                              <div class="product-incontent">
-                                <div class="product-image">
-                                  <img src="https://statics-mp.boyner.com.tr/mnresize/325/451/Boynerimages/5003271456_303_20250729121728552.jpg" style="width:100%"/>
-                                </div>
-                                <div class="product-info">
-                                  <p><strong>Discovery</strong> Yeşil Erkek Çocuk Baskılı Sweatshirt</p>
-                                  <p><strong>1.449 TL</strong></p>
-                                  <p style="margin: 15px 0; font-size: 14px;">Kargo bedava</p>
-
-                                </div>
-                              </div>
-                            </div>
+                            
                           </div>
                       </section>
                   </div>

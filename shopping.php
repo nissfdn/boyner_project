@@ -107,7 +107,11 @@
                     
                     Çocukların aktif yaşam tarzlarına uygun olarak tasarlanan bu sweatshirt, hem konforu hem de estetiği ön planda tutuyor. Farklı aksesuarlarla zenginleştirerek kişisel stillerini yansıtabilirler; örneğin renkli bileklikler veya eğlenceli şapka seçimleriyle kombininizi tamamlayabilirsiniz.
                     
-                    Keşfetmeye hazır olan küçük maceraperestlere hitap eden bu ürün için doğru zaman şimdi! Onlara stil dolu anlar yaşatmak için hemen satın alın!</p><div class="product-info-widget_productInfoWidgetDescriptionOverlay__F1XkQ"></div></div><button class="b-button b-button--secondary b-button--xsmall b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false" aria-label="DEVAMINI OKU" style="width: 135px; height: 48px;"><span class="b-typography b-typography--h6 b-typography--ellipsis" style="-webkit-line-clamp: 1;">DEVAMINI OKU</span></button></div>
+                    Keşfetmeye hazır olan küçük maceraperestlere hitap eden bu ürün için doğru zaman şimdi! Onlara stil dolu anlar yaşatmak için hemen satın alın!</p><div class="product-info-widget_productInfoWidgetDescriptionOverlay__F1XkQ"></div></div><button class="b-button b-button--secondary b-button--xsmall b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false" aria-label="DEVAMINI OKU" style="width: 135px; height: 48px;"><span class="b-typography b-typography--h6 b-typography--ellipsis" style="display: -webkit-box; 
+    -webkit-line-clamp: 1; 
+    line-clamp: 1; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden;">DEVAMINI OKU</span></button></div>
 
             </div>
 

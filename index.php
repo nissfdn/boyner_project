@@ -1,30 +1,35 @@
 
-<?php //html css gelince php onlara baglanicak genel kullanim hazir
+<?php
 session_start();
-include "config.php";
-//echo "index calisiyor<br>";
+include "config.php"; 
 
-if (isset($_SESSION['username'])) {
-    header("Location: products.php");
+// --- 1. ÇIKIŞ İŞLEMİ ---
+// Linke tıklayınca adres çubuğunda ?cikis=1 yazar, biz de bunu yakalarız.
+if (isset($_GET['cikis'])) {
+    session_destroy(); // Oturumu bitir
+    unset($_SESSION['username']);
+    header("Location: index.php"); // Sayfayı yenile
     exit();
 }
 
-$error = "";
-
-if (isset($_POST['login'])) {
-
+// --- 2. GİRİŞ İŞLEMİ ---
+$login_error = "";
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    
     $username = $_POST['username'];
     $password = $_POST['password'];
 
+    // Senin istediğin basit sorgu (Güvenlik önlemi yok)
     $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
     $result = mysqli_query($mysqli, $sql);
 
+    // Eğer veritabanında eşleşen 1 kişi varsa
     if (mysqli_num_rows($result) == 1) {
-        $_SESSION['username'] = $username;
-        header("Location: products.php");
+        $_SESSION['username'] = $username; // Giriş yapıldı olarak işaretle
+        header("Location: index.php"); // Sayfayı yenile
         exit();
     } else {
-        $error = "Invalid username or password!";
+        $login_error = "Kullanıcı adı veya şifre hatalı!";
     }
 }
 ?>
@@ -41,14 +46,108 @@ if (isset($_POST['login'])) {
   <title>Document</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/content.css">
-  <link rel="stylesheet" href="css/boyner.css">
+  <<link rel="stylesheet" href="css/boyner.css">
+
+  <style>::after
+
+    /*bu kisim style de calismiyor neden ona bak*/
+  /*popup icin css kodlari*/
+/* --- Modal (Popup) Arkaplanı --- */
+.modal {
+    display: none; /* Varsayılan olarak gizli */
+    position: fixed; 
+    z-index: 1000; /* En üstte durması için */
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5); /* Siyah yarı saydam arka plan */
+}
+
+/* --- Modal İçeriği (Kutu) --- */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Sayfanın ortasına gelmesi için */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px; /* Kutunun genişliği */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* --- Kapatma (X) Butonu --- */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* --- Form Stilleri --- */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box; /* Padding genişliği etkilemesin diye */
+}
+
+.login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.login-btn:hover {
+    background-color: #45a049;
+}
+
+/* --- Çıkış Butonu Stili --- */
+.logout-btn {
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.error-msg {
+    background-color: #ffdddd;
+    color: red;
+    padding: 10px;
+    margin: 10px;
+    text-align: center;
+    border: 1px solid red;
+}
+
+</style>
 </head>
 <body>
   
     <div class="navbar">
-      <div class="container">
+      <div class="container"> 
       <div class="topnav">
-        <a href="index.html">
+        <a href="index.php">
           <img src="https://boyner-stook-frontend.mncdn.com/web-ui/logo.svg" alt="logo">
         </a>
         
@@ -58,11 +157,74 @@ if (isset($_POST['login'])) {
         </div>
         
         <ul>
-          <li ><i class="far fa-user ince-yap"></i></li>
+          <?php if (isset($_SESSION['username'])): ?>
+                
+                <li>
+                    <a href="index.php?cikis=1" title="Çıkış Yap" style="color: inherit; text-decoration: none;">
+                        <i class="fas fa-sign-out-alt ince-yap"></i>
+                    </a>
+                </li>
+
+            <?php else: ?>
+
+                <li onclick="openModal()" style="cursor: pointer;">
+                    <i class="far fa-user ince-yap"></i>
+                </li>
+
+            <?php endif; ?> 
           <li ><i class="far fa-heart ince-yap"></i></li>
           <li><i class="fas fa-shopping-bag"></i></li>
         </ul>
       </div>
+      <?php if (isset($login_error) && !empty($login_error)): ?>
+        <div style="color: red; text-align: center; margin-top: 10px;">
+            <?php echo $login_error; ?>
+        </div>
+    <?php endif; ?>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <h2 style="text-align:center;">Giriş Yap</h2>
+            
+            <form action="index.php" method="POST">
+                <div class="input-group">
+                    <label>Kullanıcı Adı</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label>Şifre</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">Giriş Yap</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modalı seç
+        var modal = document.getElementById("loginModal");
+
+        // Açma fonksiyonu
+        function openModal() {
+            modal.style.display = "block";
+        }
+
+        // Kapatma fonksiyonu
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Boşluğa tıklayınca kapatma
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+
       <div class="bottomnav">
         <a href="#">KADIN</a>
         <a href="#">ERKEK</a>
@@ -90,7 +252,7 @@ if (isset($_POST['login'])) {
       <h1 style="color:#2B2B38;line-height: 56px; letter-spacing: 2px; font-size: 40px; margin-top: 20px; font-weight: 400;">Çocuk</h1>
     </div>
 
-    <div class="categories">
+    <div class="categories"> <!--tum resimler ayni bunlar duzenlenicek-->
       <div class="category">
         <a href="">
           <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
@@ -99,50 +261,50 @@ if (isset($_POST['login'])) {
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/bot-2_1764690279.jpg" alt="">
+        <h6>Bot Çizme</h6>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/yagmurluk_1764690312.jpg" alt="">
+        <h6>Yağmurluk</h6>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/yagmur-botu-1_1764690308.jpg" alt="">
+        <h6>Yağmur Botu</h6>
       </div>
 
       <div class="category">
-        <a href="products.html">
-          <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-          <h6>Sweetshirt</h6>
+        <a href="products.php">
+          <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/sweatshirt-1_1764690301.jpg" alt="">
+          <h6>Sweatshirt</h6>
         </a>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/sneaker-2_1764690299.jpg" alt="">
+        <h6>Sneaker</h6>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/esofman_1764690286.jpg" alt="">
+        <h6>Eşofman</h6>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/gomlek_1764690289.jpg" alt="">
+        <h6>Gömlek pantolon</h6>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/kazak2_1764690295.jpg" alt="">
+        <h6>Kazak Hırka</h6>
       </div>
 
       <div class="category">
-        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
-        <h6>Dış Giyim</h6>
+        <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/t-shirt_1764690304.jpg" alt="">
+        <h6>Tişört</h6>
       </div>
     </div>
 

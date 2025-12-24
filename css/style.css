@@ -5,6 +5,7 @@
     text-decoration-line: none;
     font-family: Jost;
 }
+
 .container{
     max-width: 1400px;
     margin: auto;
@@ -489,3 +490,4 @@ img.footer-slider_footerSliderItemIcon___V2N7 {
         color: #999;
     }
 }
+
