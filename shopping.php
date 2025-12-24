@@ -78,12 +78,36 @@ if (!$product) {
         
 
 
-          
-        <div class="addBasket" style="display: none;">
-    <div class="">
+ <?php
+$productId = $product['id'];
+
+$sql = $db->prepare("
+    SELECT size, color, image 
+    FROM product_variants 
+    WHERE product_id = ?
+");
+$sql->execute([$productId]);
+$variants = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+$sizes  = [];
+$colors = [];
+
+foreach ($variants as $v) {
+    $sizes[$v['size']] = true;
+
+    if (!empty($v['color'])) {
+        $colors[$v['color']] = $v['image'];
+    }
+}
+
+$sizes = array_keys($sizes);
+?>
+
+<div class="addBasket" style="display: none;">
+    <div>
         <img src="images/<?= $product['image'] ?>" alt="">
     </div>
-    <div class="">
+    <div>
         <h1>Ürün sepete eklendi.</h1>
         <img src="images/<?= $product['image'] ?>" alt="">
     </div>
@@ -91,7 +115,7 @@ if (!$product) {
 
 <div class="content">
     <div class="images">
-        <img src="images/<?= $product['image'] ?>" alt="big picture">
+        <img src="images/<?= $product['image'] ?>" alt="big picture" id="mainImage">
         <img src="images/<?= $product['image'] ?>" alt="little picture" style="width: 50%;">
     </div>
 
@@ -112,16 +136,38 @@ if (!$product) {
             <p style="padding: 0 10px;">Henüz değerlendirilmemiş</p>
         </div>
 
+        <!-- 🔹 BEDEN -->
         <div class="size">
-            <form action="">
-                <label for="sizes">Beden</label>
-                <select name="sizes" id="sizes">
-                    <option value="">seç</option>
-                    <option value="5-6">5-6 yaş</option>
-                    <option value="7-8">7-8 yaş</option>
-                    <option value="9-10">9-10 yaş</option>
-                    <option value="11-12">11-12 yaş</option>
+            <form>
+                <label>Beden</label>
+                <select name="size" id="size">
+                    <option value="">Seç</option>
+                    <?php foreach ($sizes as $size): ?>
+                        <option value="<?= $size ?>"><?= $size ?></option>
+                    <?php endforeach; ?>
                 </select>
+
+                <!-- 🔹 RENK -->
+                <?php if (!empty($colors)): ?>
+                    <div class="colors" style="margin-top:15px;">
+                        <label>Renk</label>
+                        <div style="display:flex; gap:10px; margin-top:5px;">
+                            <?php foreach ($colors as $color => $image): ?>
+                                <label style="cursor:pointer;">
+                                    <input type="radio" name="color"
+                                           value="<?= $color ?>"
+                                           data-image="<?= $image ?>"
+                                           style="display:none;">
+                                    <span style="border:1px solid #ccc; padding:6px 10px; border-radius:4px;">
+                                        <?= ucfirst($color) ?>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                 <input type="button" value="SEPETE EKLE" id="add">
             </form>
         </div>
@@ -144,6 +190,18 @@ if (!$product) {
         </div>
     </div>
 </div>
+
+<!-- 🔹 RENK SEÇİNCE RESİM DEĞİŞİR -->
+<script>
+document.querySelectorAll('input[name="color"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+        const image = this.dataset.image;
+        if (image) {
+            document.getElementById('mainImage').src = 'images/' + image;
+        }
+    });
+});
+</script>
 
 
     <div class="footer">
