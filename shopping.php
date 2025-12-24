@@ -221,6 +221,18 @@ document.querySelectorAll('input[name="color"]').forEach(radio => {
           <div class="footer-bottom_footerBottom__fpW9_"><div class="b-grid b-grid--container footer-bottom_footerBottomContainerWrapper__N3tx5"><div class="b-grid b-grid--row b-grid--nogutter footer-bottom_footerBottomContainer__Z3kuT"><div class="b-grid b-grid--nogutter b-grid--col b-grid--col-6 b-grid--col-sm-12 b-grid--col-md-5 footer-bottom_footerBottomContainerBox__8d0Ua"><div class="footer-bottom_footerBottomContainerBoxLogo__cNIgu"><span style="box-sizing:border-box;display:inline-block;overflow:hidden;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0;position:relative;max-width:100%"><span style="box-sizing:border-box;display:block;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0;max-width:100%"><img style="display:block;max-width:100%;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0" alt="" aria-hidden="true" src="data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27149%27%20height=%2726%27/%3e"></span><img alt="Boyner Group" src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2024/03/boyner-group.webp" decoding="async" data-nimg="intrinsic" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%;object-fit:contain"><noscript><img alt="Boyner Group" loading="lazy" decoding="async" data-nimg="intrinsic" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%;object-fit:contain" src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2024/03/boyner-group.webp"/></noscript></span></div><p class="b-typography b-typography--p14 footer-bottom_footerBottomContainerBoxText__lDc1f">© 2025 Boyner Büyük Mağazacılık A.Ş.</p></div><div class="b-grid b-grid--nogutter b-grid--col b-grid--col-6 b-grid--col-sm-12 b-grid--col-md-6 b-grid--col-sm-0-offset footer-bottom_footerBottomContainerItems__eLiV4"><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/uyelik-sozlesmesi"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">Üyelik Sözleşmesi</p></a><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/gizlilik-kurallari-site-kullanim-sartlari"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">Site Kullanım ve Gizlilik Şartları</p></a><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/kisisel-verilerin-korunmasina-iliskin-aydinlatma-metni"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">KVKK Aydınlatma Metni</p></a></div></div></div></div>
         </div>
       </div>
+<script>
+document.querySelectorAll('input[name="color"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        const image = this.getAttribute('data-image');
+        const mainImage = document.getElementById('mainImage');
+
+        if (image && image !== '') {
+            mainImage.src = 'images/' + image;
+        }
+    });
+});
+</script>
 
 </body>
 </html>
