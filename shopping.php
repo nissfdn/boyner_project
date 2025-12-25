@@ -1,27 +1,20 @@
 <?php
-session_start(); // Oturum yönetimi için şart
-include 'config.php'; // Veritabanı bağlantısı
+include "config.php";
 
-// URL'den ürün ID'sini al (id parametresi yoksa products.php'ye yönlendir)
-$product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$id = $_GET['id'];
 
-// Ürün detaylarını veritabanından çek
-$query = "SELECT * FROM products WHERE id = $product_id";
-$result = mysqli_query($mysqli, $query);
-$product = mysqli_fetch_assoc($result);
+$product = $mysqli->query("SELECT * FROM products WHERE id = $id")->fetch_assoc();
 
-// Ürün bulunamazsa ana listeye geri dön
-if (!$product) {
-    header("Location: products.php");
-    exit();
-}
+$variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $id");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/boyner.css">
     <link rel="stylesheet" href="css/content.css">
     <link rel="stylesheet" href="css/style.css">
@@ -38,9 +31,22 @@ if (!$product) {
           </div>
           
           <ul>
-            <li ><i class="far fa-user ince-yap"></i></li>
+            <?php if (isset($_SESSION['username'])): ?>
+        
+        <a href="logout.php" title="Çıkış Yap">
+            <i class="fa-solid fa-right-from-bracket" style="color: red;"></i>
+        </a>
+        
+    <?php else: ?>
+        
+        <a href="#" onclick="document.getElementById('id01').style.display='block'" title="Giriş Yap">
+            <i class="fa-regular fa-user"></i>
+        </a>
+
+    <?php endif; ?>
             <li ><i class="far fa-heart ince-yap"></i></li>
-            <li><i class="fas fa-shopping-bag"></i></li>
+            <li><a href="summary.php"><i class="fas fa-shopping-bag"></i></a></li>
+
           </ul>
         </div>
         <div class="bottomnav">
@@ -76,135 +82,72 @@ if (!$product) {
             </div>
           </div>
         
-
-
- <?php
-$stmt = $mysqli->prepare("
-    SELECT size, color, image 
-    FROM product_variants 
-    WHERE product_id = ?
-");
-$stmt->bind_param("i", $product_id);
-$stmt->execute();
-
-$result = $stmt->get_result();
-$variants = $result->fetch_all(MYSQLI_ASSOC);
-
-$sizes  = [];
-$colors = [];
-
-foreach ($variants as $v) {
-    $sizes[$v['size']] = true;
-
-    if (!empty($v['color'])) {
-        $colors[$v['color']] = $v['image'];
-    }
-}
-
-$sizes = array_keys($sizes);
-?>
-
-
-<div class="addBasket" style="display: none;">
-    <div>
-        <img src="images/<?= $product['image'] ?>" alt="">
-    </div>
-    <div>
-        <h1>Ürün sepete eklendi.</h1>
-        <img src="images/<?= $product['image'] ?>" alt="">
-    </div>
-</div>
-
-<div class="content">
-    <div class="images">
-        <img src="images/<?= $product['image'] ?>" alt="big picture" id="mainImage">
-        <img src="images/<?= $product['image'] ?>" alt="little picture" style="width: 50%;">
-    </div>
-
-    <div class="infos">
-        <h1 style="font-size: 24px;">
-            <strong><?= $product['brand'] ?></strong>
-            <?= $product['name'] ?>
-        </h1>
-
-        <p>Satıcı : BOYNER</p>
-
-        <h2 style="font-size: 24px; font-weight: bold;">
-            <?= number_format($product['price'], 2) ?> TL
-        </h2>
-
-        <div class="Rate">
-            <i class="b-icon b-icon--star-full" style="color: var(--semantic-foreground-inverse-secondary); font-size: 24px;"></i>
-            <p style="padding: 0 10px;">Henüz değerlendirilmemiş</p>
-        </div>
-
-        <!-- 🔹 BEDEN -->
-        <div class="size">
-            <form>
-                <label>Beden</label>
-                <select name="size" id="size">
-                    <option value="">Seç</option>
-                    <?php foreach ($sizes as $size): ?>
-                        <option value="<?= $size ?>"><?= $size ?></option>
-                    <?php endforeach; ?>
-                </select>
-
-                <!-- 🔹 RENK -->
-                <?php if (!empty($colors)): ?>
-                    <div class="colors" style="margin-top:15px;">
-                        <label>Renk</label>
-                        <div style="display:flex; gap:10px; margin-top:5px;">
-                            <?php foreach ($colors as $color => $image): ?>
-                                <label style="cursor:pointer;">
-                                    <input type="radio" name="color"
-                                           value="<?= $color ?>"
-                                           data-image="<?= $image ?>"
-                                           style="display:none;">
-                                    <span style="border:1px solid #ccc; padding:6px 10px; border-radius:4px;">
-                                        <?= ucfirst($color) ?>
-                                    </span>
-                                </label>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                <input type="button" value="SEPETE EKLE" id="add">
-            </form>
-        </div>
-
-        <div>
-            <h4 class="b-typography b-typography--h4">Ürün Bilgileri</h4>
-
-            <div class="product-info-widget_productInfoWidgetDescription__76Qsj">
-                <p class="b-typography b-typography--p16">
-                    <?= nl2br($product['description']) ?>
-                </p>
-                <div class="product-info-widget_productInfoWidgetDescriptionOverlay__F1XkQ"></div>
+          <div class="addBasket"  style="display: none;">
+            <div class="">
+                <img src="https://statics-mp.boyner.com.tr/mnresize/1100/-/Boynerimages/5003271456_303_20250729121728552.jpg?v=1753781005" alt="">
+            </div>
+            <div class="">
+                <h1>Ürün sepete eklendi.</h1>
+                <!---->
+                <img src="" alt="">
             </div>
 
-            <button class="b-button b-button--secondary b-button--xsmall b-button--text-style-heading"
-                type="button"
-                style="width: 135px; height: 48px;">
-                DEVAMINI OKU
-            </button>
+          </div>
+
+<!--databasedeki verileri bagladik name image price falan-->
+          <div class="content" >
+            <div class="images">
+                <img id="mainImage" src="images/<?= $product['image'] ?>" alt="">
+            </div>
+            <div class="infos">
+                <h1 style="font-size: 24px;"><strong><?= $product['brand'] ?></strong> <?= $product['name'] ?></h1>
+                <p>Satıcı : BOYNER</p>
+                <h2 style="font-size: 24px; font-weight: bold;"> <?= number_format($product['price'],2) ?> TL</h2>
+                <div class="Rate">
+                    <i class="b-icon b-icon--star-full" style="color: var(--semantic-foreground-inverse-secondary); font-size: 24px;"></i>
+                    <p style="padding: 0 10px;">Henüz değerlendirilmemiş</p>
+                </div>
+                <div class="size">
+                    <form action="add_to_cart.php" method="POST">
+
+    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+    <input type="hidden" name="product_name" value="<?= $product['name'] ?>">
+    <input type="hidden" name="product_price" value="<?= $product['price'] ?>">
+    <input type="hidden" name="product_image" value="<?= $product['image'] ?>">
+
+    <label>Beden</label><br>
+
+    <select name="variant_id" id="variantSelect" required>
+        <option value="">Seçiniz</option>
+
+        <?php while($v = $variants->fetch_assoc()): ?>
+            <option 
+                value="<?= $v['id'] ?>"
+                data-image="<?= $v['image'] ?>"
+                data-stock="<?= $v['stock'] ?>"
+            >
+                <?= $v['size'] ?> - <?= $v['color'] ?>
+            </option>
+        <?php endwhile; ?>
+    </select>
+
+    <br><br>
+
+    <button type="submit">SEPETE EKLE</button>
+</form>
+
+                </div>
+
+                <div>
+                    <div class="detail-infoBox_detailInfo__1AtL7"><div class="detail-infoBox_detailInfoDelivery__7BqkL"><div class="delivery-time_deliveryTime__tYTGa"><i class="b-icon b-icon--delivery1-light delivery-time_deliveryTimeIcon__Edq84" style="font-size: 32px;"></i><div class="delivery-time_deliveryTimeTextContent__YF0hE"><div class="delivery-time_deliveryTimeTextContentHeader__FCEvI"><h6 class="b-typography b-typography--h6 delivery-time_deliveryTimeTextContentType__S4pb_" style="color: rgb(43, 43, 56);">Standart Teslimat</h6><div class="delivery-time_deliveryTimeIsFree__XjVKQ"></div></div><p class="b-typography b-typography--p14">Tahmini 24 Aralık Çarşamba Kargoda</p></div></div></div><div class="detail-infoBox_detailInfoBenefits__aSybF"><div class="benefits_benefits__XT7Kw"><i class="b-icon b-icon--receive-package-light" style="font-size: 24px;"></i><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">Dilediğin Zaman, Mağazadan veya Kargo ile İade</p></div><div class="benefits_benefits__XT7Kw"><i class="b-icon b-icon--store-light" style="font-size: 24px;"></i><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">Mağazadan Değişim</p></div><div class="benefits_benefits__XT7Kw"><img alt="logo" loading="lazy" width="24" height="24" decoding="async" data-nimg="1" src="https://boyner-stook-frontend.mncdn.com/public/footer/tiklagel.png" style="color: transparent;"><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">Tıkla Gel ile Mağazadan Teslim Alınabilir<button class="b-button b-button--base b-button--medium b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false"><i class="b-icon b-icon--info-medium b-button__icon" style="color: var(--semantic-foreground-secondary); font-size: 16px;"></i></button></p></div><div class="benefits_benefits__XT7Kw"><i class="b-icon b-icon--quality-boyner-light" style="font-size: 24px;"></i><p class="b-typography b-typography--p14 benefits_benefitsLabel__qUWQp">%100 Orijinal Ürün Garantisi<div class="b-tooltip" aria-describedby="tooltip-text"><button class="b-button b-button--base b-button--medium b-button--text-style-heading" type="button" aria-disabled="false" aria-busy="false"><i class="b-icon b-icon--info-medium b-button__icon" style="color: var(--semantic-foreground-secondary); font-size: 16px;"></i></button><div class="b-tooltip__box b-tooltip__box--bottom b-tooltip__box--bottom-center" aria-hidden="true" role="tooltip" id="tooltip-text"><div class="b-tooltip__box-arrow"></div><div class="b-tooltip__box-content"><p class="b-typography b-typography--p14">Bize duyduğun güven birinci önceliğimiz. Ürünleri resmi tedarikçilerinden alarak %100 orijinal ürün garantisi ile seninle buluşturuyoruz.</p></div></div></div></p></div></div></div></div>
+                
+                <div class="product-info">
+            <h4>Ürün Bilgileri</h4>
+            <p><?= nl2br($product['description']) ?></p>
+        </div>
+
         </div>
     </div>
-</div>
-
-<!-- 🔹 RENK SEÇİNCE RESİM DEĞİŞİR -->
-<script>
-document.querySelectorAll('input[name="color"]').forEach(radio => {
-    radio.addEventListener('change', function () {
-        const image = this.dataset.image;
-        if (image) {
-            document.getElementById('mainImage').src = 'images/' + image;
-        }
-    });
-});
-</script>
-
 
     <div class="footer">
         <div class="container">
@@ -221,17 +164,20 @@ document.querySelectorAll('input[name="color"]').forEach(radio => {
           <div class="footer-bottom_footerBottom__fpW9_"><div class="b-grid b-grid--container footer-bottom_footerBottomContainerWrapper__N3tx5"><div class="b-grid b-grid--row b-grid--nogutter footer-bottom_footerBottomContainer__Z3kuT"><div class="b-grid b-grid--nogutter b-grid--col b-grid--col-6 b-grid--col-sm-12 b-grid--col-md-5 footer-bottom_footerBottomContainerBox__8d0Ua"><div class="footer-bottom_footerBottomContainerBoxLogo__cNIgu"><span style="box-sizing:border-box;display:inline-block;overflow:hidden;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0;position:relative;max-width:100%"><span style="box-sizing:border-box;display:block;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0;max-width:100%"><img style="display:block;max-width:100%;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0" alt="" aria-hidden="true" src="data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27149%27%20height=%2726%27/%3e"></span><img alt="Boyner Group" src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2024/03/boyner-group.webp" decoding="async" data-nimg="intrinsic" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%;object-fit:contain"><noscript><img alt="Boyner Group" loading="lazy" decoding="async" data-nimg="intrinsic" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%;object-fit:contain" src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2024/03/boyner-group.webp"/></noscript></span></div><p class="b-typography b-typography--p14 footer-bottom_footerBottomContainerBoxText__lDc1f">© 2025 Boyner Büyük Mağazacılık A.Ş.</p></div><div class="b-grid b-grid--nogutter b-grid--col b-grid--col-6 b-grid--col-sm-12 b-grid--col-md-6 b-grid--col-sm-0-offset footer-bottom_footerBottomContainerItems__eLiV4"><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/uyelik-sozlesmesi"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">Üyelik Sözleşmesi</p></a><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/gizlilik-kurallari-site-kullanim-sartlari"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">Site Kullanım ve Gizlilik Şartları</p></a><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/kisisel-verilerin-korunmasina-iliskin-aydinlatma-metni"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">KVKK Aydınlatma Metni</p></a></div></div></div></div>
         </div>
       </div>
-<script>
-document.querySelectorAll('input[name="color"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-        const image = this.getAttribute('data-image');
-        const mainImage = document.getElementById('mainImage');
 
-        if (image && image !== '') {
-            mainImage.src = 'images/' + image;
-        }
-    });
+      <!-- resimlerin renk degistiginde yenilenmesi icin-->
+      <script>
+document.getElementById("variantSelect").addEventListener("change", function () {
+    const img = this.options[this.selectedIndex].dataset.image;
+
+    if (img && img !== "") {
+        document.getElementById("mainImage").src = "images/" + img;
+    } else {
+        document.getElementById("mainImage").src = "images/<?= $product['image'] ?>";
+    }
 });
+
+
 </script>
 
 </body>

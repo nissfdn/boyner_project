@@ -56,7 +56,8 @@ $total_products = $result->num_rows;
 
     <?php endif; ?>
             <li ><i class="far fa-heart ince-yap"></i></li>
-            <li><i class="fas fa-shopping-bag"></i></li>
+            <li><a href="summary.php">
+    <li><i class="fas fa-shopping-bag"></i></li>
           </ul>
         </div>
         <div class="bottomnav">

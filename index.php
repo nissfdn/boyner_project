@@ -123,13 +123,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     background-color: #45a049;
 }
 
-/* --- Çıkış Butonu Stili --- */
-.logout-btn {
-    color: red;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 10px;
-}
+
 
 .error-msg {
     background-color: #ffdddd;
@@ -173,7 +167,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
             <?php endif; ?> 
           <li ><i class="far fa-heart ince-yap"></i></li>
-          <li><i class="fas fa-shopping-bag"></i></li>
+          <li><a href="summary.php">
+    <li><i class="fas fa-shopping-bag"></i></li>
+  </a></li>
         </ul>
       </div>
       <?php if (isset($login_error) && !empty($login_error)): ?>
