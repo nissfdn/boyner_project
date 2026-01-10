@@ -1,23 +1,49 @@
 <?php
+session_start();
 include "config.php";
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;   
+  
+$selected_color_id = isset($_POST['color_id']) ? $_POST['color_id'] : null;
 
-$product = $mysqli->query("SELECT * FROM products WHERE id = $id")->fetch_assoc();
+if ($id > 0) {
+    // Ürün bilgilerini çekiyoruz
+    $product_res = $mysqli->query("SELECT * FROM products WHERE id = $id");
+    $product = $product_res->fetch_assoc();
 
-$variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $id");
+    // RENKLER: Aynı rengi defalarca göstermemek için GROUP BY color ekledik
+    $color_variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $id GROUP BY color");
+
+    // BEDENLER: 3, 4, 5 gibi sadece tekil değerleri göstermek için GROUP BY size ekledik
+    $size_variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $id GROUP BY size ORDER BY size ASC");
+}
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Boyner</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/boyner.css">
     <link rel="stylesheet" href="css/content.css">
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+/* Tıklanan resmin etrafını siyah çerçeve yapar */
+.color-option input:checked + .image-box img {
+    border: 2px solid #000 !important;
+}
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+</style>
 </head>
 <body>
     <div class="navbar">
@@ -115,25 +141,52 @@ $variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $i
     <input type="hidden" name="product_price" value="<?= $product['price'] ?>">
     <input type="hidden" name="product_image" value="<?= $product['image'] ?>">
 
-    <label>Beden</label><br>
 
-    <select name="variant_id" id="variantSelect" required>
-        <option value="">Seçiniz</option>
 
-        <?php while($v = $variants->fetch_assoc()): ?>
-            <option 
-                value="<?= $v['id'] ?>"
-                data-image="<?= $v['image'] ?>"
-                data-stock="<?= $v['stock'] ?>"
-            >
-                <?= $v['size'] ?> - <?= $v['color'] ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
+<br><br>
 
-    <br><br>
 
-    <button type="submit">SEPETE EKLE</button>
+
+<label style="font-weight: bold;">Renk: <span id="selectedColorName" style="font-weight: normal; color: #666;">Seçiniz</span></label>
+<div class="color-variant-wrapper" style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+    <?php while($v = $color_variants->fetch_assoc()): ?>
+        <label class="color-option" style="cursor: pointer;">
+            <input type="radio" name="color_id" value="<?= $v['id'] ?>" 
+                   data-color-name="<?= $v['color'] ?>" 
+                   data-image="<?= $v['image'] ?>" 
+                   onchange="updateVariant(this)" required style="display: none;">
+            
+            <div class="image-box-container">
+                <?php 
+                // Varyant resmi yoksa ana resmi kullan
+                $img_name = (!empty($v['image'])) ? $v['image'] : $product['image'];
+                
+                // Eğer SQL'de nokta eksikse (25(2)webp gibi) otomatik nokta ekleme denemesi:
+                if (!strpos($img_name, '.')) {
+                    $img_name = str_replace('webp', '.webp', $img_name);
+                }
+                ?>
+                <img src="images/<?= $img_name ?>" alt="<?= $v['color'] ?>" 
+                     style="width: 70px; height: 90px; object-fit: cover; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2px;">
+                <div style="font-size: 10px; text-align: center; color: #666;"><?= ucfirst($v['color']) ?></div>
+            </div>
+        </label>
+    <?php endwhile; ?>
+</div>
+
+<label style="font-weight: bold;">Beden</label><br>
+<select name="variant_id" id="sizeSelect" required 
+        style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; margin-top: 8px;">
+    <option value="">Beden Seçiniz</option>
+    <?php while($s = $size_variants->fetch_assoc()): ?>
+        <option value="<?= $s['id'] ?>">
+            <?= $s['size'] ?>
+        </option>
+    <?php endwhile; ?>
+</select>
+<br><br>
+
+<button type="submit" style="width: 100%; background: #000; color: #fff; padding: 16px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; letter-spacing: 1px;">SEPETE EKLE</button>
 </form>
 
                 </div>
@@ -143,7 +196,7 @@ $variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $i
                 
                 <div class="product-info">
             <h4>Ürün Bilgileri</h4>
-            <p><?= nl2br($product['description']) ?></p>
+            <p><?= nl2br($product['desription']) ?></p>
         </div>
 
         </div>
@@ -165,19 +218,46 @@ $variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $i
         </div>
       </div>
 
-      <!-- resimlerin renk degistiginde yenilenmesi icin-->
-      <script>
-document.getElementById("variantSelect").addEventListener("change", function () {
-    const img = this.options[this.selectedIndex].dataset.image;
-
-    if (img && img !== "") {
-        document.getElementById("mainImage").src = "images/" + img;
-    } else {
-        document.getElementById("mainImage").src = "images/<?= $product['image'] ?>";
+<script>
+function updateVariant(element) {
+    // 1. Seçilen rengin adını yukarıdaki yazıya yazdır
+    const colorName = element.getAttribute('data-color-name');
+    const nameLabel = document.getElementById("selectedColorName");
+    if (nameLabel) {
+        nameLabel.innerText = colorName;
     }
-});
 
+    // 2. Ana resmi bul ve değiştir
+    let variantImage = element.getAttribute('data-image');
+    const mainImage = document.getElementById("mainImage"); // Büyük resmin id'si bu olmalı
+    const defaultProductImage = "images/<?= $product['image'] ?>";
 
+    if (variantImage && variantImage !== "" && variantImage !== "NULL") {
+        // SQL'deki noktasız dosya isimlerini (örn: 25(2)webp) düzelt
+        if (!variantImage.includes('.')) {
+            variantImage = variantImage.replace('webp', '.webp');
+        }
+        
+        // Resmi klasör yoluyla birleştir ve ana resme bas
+        if (mainImage) {
+            mainImage.src = "images/" + variantImage;
+        }
+    } else {
+        // Eğer varyant resmi yoksa ürünün ana resmine dön
+        if (mainImage) {
+            mainImage.src = defaultProductImage;
+        }
+    }
+
+    window.onload = function() {
+    // Sayfa açıldığında seçili olan (checked) radyo butonunu bul
+    const checkedRadio = document.querySelector('input[name="color_id"]:checked');
+    if (checkedRadio) {
+        // Eğer bir seçim varsa, otomatik olarak updateVariant fonksiyonunu çalıştır
+        updateVariant(checkedRadio);
+    }
+};
+}
 </script>
 
 </body>
