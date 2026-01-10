@@ -136,10 +136,14 @@ if ($id > 0) {
                 <div class="size">
                     <form action="add_to_cart.php" method="POST">
 
+
     <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
     <input type="hidden" name="product_name" value="<?= $product['name'] ?>">
     <input type="hidden" name="product_price" value="<?= $product['price'] ?>">
-    <input type="hidden" name="product_image" value="<?= $product['image'] ?>">
+<input type="hidden" name="product_image" id="product_image" value="<?= $product['image'] ?>">
+<input type="hidden" name="product_color" id="product_color">
+<input type="hidden" name="product_size"  id="product_size">
+
 
 
 
@@ -175,7 +179,8 @@ if ($id > 0) {
 </div>
 
 <label style="font-weight: bold;">Beden</label><br>
-<select name="variant_id" id="sizeSelect" required 
+<select name="variant_id" id="sizeSelect" required
+        onchange="document.getElementById('product_size').value=this.options[this.selectedIndex].text">
         style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; margin-top: 8px;">
     <option value="">Beden Seçiniz</option>
     <?php while($s = $size_variants->fetch_assoc()): ?>
@@ -220,44 +225,44 @@ if ($id > 0) {
 
 <script>
 function updateVariant(element) {
-    // 1. Seçilen rengin adını yukarıdaki yazıya yazdır
+    // 1️⃣ Renk adı
     const colorName = element.getAttribute('data-color-name');
     const nameLabel = document.getElementById("selectedColorName");
     if (nameLabel) {
         nameLabel.innerText = colorName;
     }
 
-    // 2. Ana resmi bul ve değiştir
+    // 2️⃣ Resim
     let variantImage = element.getAttribute('data-image');
-    const mainImage = document.getElementById("mainImage"); // Büyük resmin id'si bu olmalı
+    const mainImage = document.getElementById("mainImage");
     const defaultProductImage = "images/<?= $product['image'] ?>";
 
     if (variantImage && variantImage !== "" && variantImage !== "NULL") {
-        // SQL'deki noktasız dosya isimlerini (örn: 25(2)webp) düzelt
         if (!variantImage.includes('.')) {
             variantImage = variantImage.replace('webp', '.webp');
         }
-        
-        // Resmi klasör yoluyla birleştir ve ana resme bas
         if (mainImage) {
             mainImage.src = "images/" + variantImage;
         }
     } else {
-        // Eğer varyant resmi yoksa ürünün ana resmine dön
         if (mainImage) {
             mainImage.src = defaultProductImage;
         }
+        variantImage = "<?= $product['image'] ?>";
     }
 
-    window.onload = function() {
-    // Sayfa açıldığında seçili olan (checked) radyo butonunu bul
+    // 🔥 3️⃣ SEPETE GİDECEK GERÇEK VERİLER
+    document.getElementById('product_color').value = colorName;
+    document.getElementById('product_image').value = variantImage;
+}
+
+// ✅ SAYFA AÇILINCA SEÇİLİ RENK VARSA ÇALIŞTIR
+window.onload = function () {
     const checkedRadio = document.querySelector('input[name="color_id"]:checked');
     if (checkedRadio) {
-        // Eğer bir seçim varsa, otomatik olarak updateVariant fonksiyonunu çalıştır
         updateVariant(checkedRadio);
     }
 };
-}
 </script>
 
 </body>
