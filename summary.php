@@ -22,7 +22,7 @@ foreach ($sepetUrunleri as $urun) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Boyner</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/boyner.css">
@@ -91,7 +91,7 @@ foreach ($sepetUrunleri as $urun) {
             <div style="padding:40px; text-align:center;">Sepetinizde ürün bulunmamaktadır.</div>
         <?php else: ?>
             
-            <?php foreach ($cartItems as $product_id => $urun): 
+            <?php foreach ($cartItems as $cart_key => $urun): 
                 // Senin addtocart.php'deki 'qty' verisi burada kullanılıyor
                 $adet = isset($urun['qty']) ? $urun['qty'] : 1;
                 $fiyat = isset($urun['price']) ? $urun['price'] : 0;
@@ -134,6 +134,12 @@ foreach ($sepetUrunleri as $urun) {
                                             <a class="product-info_productInfoBoxTextWrapperTitle__CpqOs" href="#" style="text-decoration: none;">
                                                 <p class="b-typography b-typography--p16 b-typography--ellipsis b-typography--ellipsis-lines" style="-webkit-line-clamp: 2;">
                                                     <b><?= htmlspecialchars($urun['brand']) ?></b> <?= htmlspecialchars($urun['name']) ?>
+<div class="variant-box">
+    <button class="variant-btn">
+        <?= htmlspecialchars($urun['color']) ?> / <?= htmlspecialchars($urun['size']) ?>
+    </button>
+</div>
+
                                                 </p>
                                             </a>
                                         </div>
@@ -147,27 +153,28 @@ foreach ($sepetUrunleri as $urun) {
 
                             <div class="product-counter_productCounterWrapper__mHw67">
     <div class="product-counter_productCounter__1M5DI">
-        <button onclick="updateCart('<?= $product_id ?>', 'decrease')" class="b-button b-button--base b-button--medium b-button--text-style-heading product-counter_productCounterButton__eJIBf" type="button">
+        <button onclick="updateCart('<?= $cart_key ?>', 'decrease')" class="b-button b-button--base b-button--medium b-button--text-style-heading product-counter_productCounterButton__eJIBf" type="button">
             <i class="b-icon b-icon--minus-medium"></i>
         </button>
         
-        <input id="qty-<?= $product_id ?>" type="number" class="product-counter_productCounterInput__s8rq2" value="<?= $adet ?>" readonly>
+        <input id="qty-<?= $cart_key ?>" type="number" class="product-counter_productCounterInput__s8rq2" value="<?= $adet ?>" readonly>
         
-        <button onclick="updateCart('<?= $product_id ?>', 'increase')" class="b-button b-button--base b-button--medium b-button--text-style-heading product-counter_productCounterButton__eJIBf" type="button">
+        <button onclick="updateCart('<?= $cart_key?>', 'increase')" class="b-button b-button--base b-button--medium b-button--text-style-heading product-counter_productCounterButton__eJIBf" type="button">
             <i class="b-icon b-icon--plus-bold"></i>
         </button>
     </div>
 </div>
 
 <div class="price_priceLeft__VRQGR cart-product-desktop_cartProductDetailItem__LnYFZ cart-product-desktop_cartProductDetailItemPrice__x5fVm">
-    <h5 id="total-<?= $product_id ?>" class="b-typography b-typography--h5 price_priceMain__DrVVQ b-typography--ellipsis" style="-webkit-line-clamp: 1;">
+    <h5 id="total-<?= $cart_key ?>" class="b-typography b-typography--h5 price_priceMain__DrVVQ b-typography--ellipsis" style="-webkit-line-clamp: 1;">
         <?= number_format($toplamFiyat, 2, ',', '.') ?> TL
     </h5>
 </div>
 
                             <div class="favorite_favorite__eM4RC">
-                                <a href="remove_cart.php?id=<?= $product_id ?>" class="b-button" style="color:red; font-size:12px; text-decoration:none;">
-                                    <i class="fas fa-trash"></i> Sil
+                               <a href="remove_cart.php?id=<?= urlencode($cart_key) ?>" class="b-button" style="color:red; text-decoration:none;">
+    <i class="fas fa-trash"></i> Sil
+</a>
                                 </a>
                             </div>
                         </div>
@@ -291,38 +298,26 @@ foreach ($sepetUrunleri as $urun) {
     </div>
 
 <script>
-function updateCart(productId, action) {
-    // Fetch API kullanarak PHP'ye istek atıyoruz
+function updateCart(cartKey, action) { // productId yerine cartKey yazıyoruz
     fetch('update_cart.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            id: productId,
+            id: cartKey, // PHP'ye artık 102_Kirmizi_S gibi bir metin gidiyor
             action: action
         }),
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // 1. Adet kutusunu güncelle
-            document.getElementById('qty-' + productId).value = data.newQty;
+            // HTML'deki ID'leri de cartKey ile buluyoruz
+            document.getElementById('qty-' + cartKey).value = data.newQty;
+            document.getElementById('total-' + cartKey).innerText = data.newItemTotal;
             
-            // 2. O ürünün toplam fiyatını güncelle
-            document.getElementById('total-' + productId).innerText = data.newItemTotal;
-            
-            // 3. Genel toplamları güncelle (Hem yukarıdaki hem aşağıdaki)
-            if(document.getElementById('grand-total-1')) {
-                document.getElementById('grand-total-1').innerText = data.newGrandTotal;
-            }
-            if(document.getElementById('grand-total-2')) {
-                document.getElementById('grand-total-2').innerText = data.newGrandTotal;
-            }
+            // Genel toplamları güncelle
+            document.getElementById('grand-total-1').innerText = data.newGrandTotal;
+            document.getElementById('grand-total-2').innerText = data.newGrandTotal;
         }
-    })
-    .catch((error) => {
-        console.error('Hata:', error);
     });
 }
 </script>
