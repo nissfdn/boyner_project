@@ -2,21 +2,64 @@
 session_start();
 include "Config.php";
 
-$sql = "SELECT * FROM products ORDER BY id DESC";
-$result = $mysqli->query($sql); // $mysqli değişkeni config.php'den geliyor
+// WHERE şartlarını tutacak dizimiz
+$where = [];
 
-// Sorguda hata var mı kontrol et
+// --- 1. CİNSİYET (DÜZELTİLDİ) ---
+// Artık checkbox kullandığımız için burası da dizi mantığıyla (IN) çalışmalı
+if (!empty($_GET['gender'])) {
+    // Güvenlik: Gelen veri dizi mi kontrol et, değilse diziye çevir
+    $gelen_gender = is_array($_GET['gender']) ? $_GET['gender'] : [$_GET['gender']];
+    
+    // Her seçeneği temizle ve tırnak içine al
+    $cinsiyetler = array_map(fn($g) => "'" . $mysqli->real_escape_string($g) . "'", $gelen_gender);
+    
+    // SQL'e ekle: gender IN ('Erkek Cocuk', 'Kiz Cocuk')
+    $where[] = "gender IN (" . implode(",", $cinsiyetler) . ")";
+}
+
+// --- 2. MARKA ---
+if (!empty($_GET['brand'])) {
+    
+    $brands = array_map(fn($b)=>"'".$mysqli->real_escape_string($b)."'", $_GET['brand']);
+    $where[] = "brand IN (".implode(",", $brands).")";
+}
+
+// --- 3. KATEGORİ ---
+if (!empty($_GET['category'])) {
+    $cats = array_map(fn($c)=>"'".$mysqli->real_escape_string($c)."'", $_GET['category']);
+    $where[] = "category IN (".implode(",", $cats).")";
+}
+
+
+// --- 4. FİYAT ---
+if (!empty($_GET['min_price']) && !empty($_GET['max_price'])) {
+    // Sayı olduklarından emin olmak için (int) eklemek iyi olur
+    $min = (int)$_GET['min_price'];
+    $max = (int)$_GET['max_price'];
+    $where[] = "price BETWEEN $min AND $max";
+}
+
+// --- SORGUE OLUŞTURMA ---
+$sql = "SELECT * FROM products";
+
+if (!empty($where)) {
+    $sql .= " WHERE " . implode(" AND ", $where);
+}
+
+$sql .= " ORDER BY id DESC";
+
+// --- SORGUE ÇALIŞTIRMA ---
+$result = $mysqli->query($sql);
+
 if (!$result) {
     die("Sorgu Hatası: " . $mysqli->error);
 }
 
-// Verileri diziye çevir
-// Not: fetch_all komutu verileri toplu çeker.
+// Verileri çek
 $products = $result->fetch_all(MYSQLI_ASSOC);
-
-// --- ÜRÜN SAYISINI HESAPLA ---
 $total_products = $result->num_rows; 
-?> 
+?>
 
 
 <!DOCTYPE html>
@@ -91,77 +134,134 @@ $total_products = $result->num_rows;
               </nav>
               <div class="content">
                 <!-- Filtreler -->
-                  <div class="b-grid b-grid--col b-grid--col-2">
-                      <div class="filter_filtersContainer__spTgr">
-                          <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide filter_filtersContainerScrollbar__uOXKt">
-                              <div class="b-scrollbar__content">
-                                  <div class="b-accordion b-accordion--transparent b-accordion--large">
-                                      <div class="b-panel b-panel--expanded b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Cinsiyet</span></h2></div><i class="b-icon b-icon--minus-medium"></i></div>
-                                          <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded"><div class="b-panel__b-panel-content__inner"><div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide filter_filterItemsCheckboxs__NPrqw"><div class="b-scrollbar__content">
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div><div class="b-checkbox__label"><span>Erkek Çocuk</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div><div class="b-checkbox__label"><span>Kız Çocuk</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div><div class="b-checkbox__label"><span>Erkek Bebek</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div><div class="b-checkbox__label"><span>Kız Bebek</span></div></label>
-                                          </div></div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--expanded b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Marka</span></h2></div><i class="b-icon b-icon--minus-medium"></i></div>
-                                          <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded"><div class="b-panel__b-panel-content__inner"><div class="b-search-input b-search-input--small filter_filterItemsInput__OA7zw"><div class="b-search-input__wrapper"><input type="text" placeholder="Marka Ara"/></div></div><div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide filter_filterItemsCheckboxs__NPrqw"><div class="b-scrollbar__content">
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__label"><span>U.S. Polo Assn.</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__label"><span>Gap</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__label"><span>Nike</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl"><input type="checkbox" class="b-checkbox__input"/><div class="b-checkbox__label"><span>Adidas</span></div></label>
-                                          </div></div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Ürün Çeşidi</span></h2></div><i class="b-icon b-icon--plus-bold"></i></div>
-                                          <div class="b-panel__b-panel-content"><div class="b-panel__b-panel-content__inner"><div class="b-scrollbar__content">
-                                              <label class="b-typography b-typography--p14 b-checkbox filter_filterItemsCheckbox__iQpwl"><input type="checkbox"/><div class="b-checkbox__label"><span>Sweatshirt</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox filter_filterItemsCheckbox__iQpwl"><input type="checkbox"/><div class="b-checkbox__label"><span>Ceket</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox filter_filterItemsCheckbox__iQpwl"><input type="checkbox"/><div class="b-checkbox__label"><span>Eşofman Üstü</span></div></label>
-                                          </div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Beden</span></h2></div><i class="b-icon b-icon--plus-bold"></i></div>
-                                          <div class="b-panel__b-panel-content"><div class="b-panel__b-panel-content__inner"><div class="b-scrollbar__content">
-                                              <label class="b-typography b-typography--p14 b-checkbox"><input type="checkbox"/><div class="b-checkbox__label"><span>6-7 Yaş</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox"><input type="checkbox"/><div class="b-checkbox__label"><span>7-8 Yaş</span></div></label>
-                                          </div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Renk</span></h2></div><i class="b-icon b-icon--plus-bold"></i></div>
-                                          <div class="b-panel__b-panel-content"><div class="b-panel__b-panel-content__inner"><div class="b-scrollbar__content">
-                                              <label class="b-typography b-typography--p14 b-checkbox"><input type="checkbox"/><div class="b-checkbox__label"><span>Siyah</span></div></label>
-                                              <label class="b-typography b-typography--p14 b-checkbox"><input type="checkbox"/><div class="b-checkbox__label"><span>Pembe</span></div></label>
-                                          </div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Satıcı</span></h2></div><i class="b-icon b-icon--plus-bold"></i></div>
-                                          <div class="b-panel__b-panel-content"><div class="b-panel__b-panel-content__inner"><div class="b-scrollbar__content">
-                                              <label class="b-typography b-typography--p14 b-checkbox"><input type="checkbox"/><div class="b-checkbox__label"><span>Boyner</span></div></label>
-                                          </div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Fiyat</span></h2></div><i class="b-icon b-icon--plus-bold"></i></div>
-                                          <div class="b-panel__b-panel-content"><div class="b-panel__b-panel-content__inner"><div class="b-range b-range--size-small">
-                                              <input type="number" value="99"/> <span>-</span> <input type="number" value="32880"/>
-                                          </div></div></div>
-                                      </div>
-                                      <div class="b-panel b-panel--last-item b-panel--size-large">
-                                          <div class="b-panel__b-panel-header"><div class="b-panel__b-panel-header__title"><h2 class="b-typography b-typography--h4"><span>Değerlendirme</span></h2></div><i class="b-icon b-icon--plus-bold"></i></div>
-                                          <div class="b-panel__b-panel-content"><div class="b-panel__b-panel-content__inner">
-                                              <label class="b-radio"><input type="radio"/> 4 yıldız ve üzeri</label>
-                                          </div></div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                
+                <div class="filter_filtersContainer__spTgr">
+    <form action="" method="GET" id="filtreFormu">
 
+        <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide filter_filtersContainerScrollbar__uOXKt">
+            <div class="b-scrollbar__content">
+                <div class="b-accordion b-accordion--transparent b-accordion--large">
 
-                  <!-- Ürün listesi  -->
+                    <div class="b-panel b-panel--expanded b-panel--size-large">
+                        <div class="b-panel__b-panel-header">
+                            <div class="b-panel__b-panel-header__title">
+                                <h2 class="b-typography b-typography--h4"><span>Cinsiyet</span></h2>
+                            </div>
+                            <i class="b-icon b-icon--minus-medium"></i>
+                        </div>
+                        <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded">
+                            <div class="b-panel__b-panel-content__inner">
+                                <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide">
+                                    <div class="b-scrollbar__content">
+                                        <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled">
+                                            <input type="checkbox" name="gender[]" value="Erkek Cocuk" class="b-checkbox__input"
+                                                <?= (isset($_GET['gender']) && is_array($_GET['gender']) && in_array("Erkek Cocuk", $_GET['gender'])) ? 'checked' : '' ?> />
+                                            <div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div>
+                                            <div class="b-checkbox__label"><span>Erkek Çocuk</span></div>
+                                        </label>
+                                        
+                                        <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled">
+                                            <input type="checkbox" name="gender[]" value="Kiz Cocuk" class="b-checkbox__input"
+                                                <?= (isset($_GET['gender']) && is_array($_GET['gender']) && in_array("Kiz Cocuk", $_GET['gender'])) ? 'checked' : '' ?> />
+                                            <div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div>
+                                            <div class="b-checkbox__label"><span>Kız Çocuk</span></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="b-panel b-panel--expanded b-panel--size-large">
+                        <div class="b-panel__b-panel-header">
+                            <div class="b-panel__b-panel-header__title">
+                                <h2 class="b-typography b-typography--h4"><span>Marka</span></h2>
+                            </div>
+                            <i class="b-icon b-icon--minus-medium"></i>
+                        </div>
+                        <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded">
+                            <div class="b-panel__b-panel-content__inner">
+                                <div class="b-search-input b-search-input--small filter_filterItemsInput__OA7zw">
+                                    <div class="b-search-input__wrapper"><input type="text" placeholder="Marka Ara" /></div>
+                                </div>
+                                <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide filter_filterItemsCheckboxs__NPrqw">
+                                    <div class="b-scrollbar__content">
+                                        <?php 
+                                        //manuel eklendi
+                                        $markalar = ["U.S. Polo Assn.", "Gap", "Nike", "Mavi", "Barbie", "Jeep", "United Colors of Benetton", "Calvin Klein", "Mayoral", "Puma"];
+                                        foreach($markalar as $marka): 
+                                        ?>
+                                        <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl">
+                                            <input type="checkbox" name="brand[]" value="<?= $marka ?>" class="b-checkbox__input"
+                                                <?= (isset($_GET['brand']) && is_array($_GET['brand']) && in_array($marka, $_GET['brand'])) ? 'checked' : '' ?> />
+                                            <div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div>
+                                            <div class="b-checkbox__label"><span><?= $marka ?></span></div>
+                                        </label>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="b-panel b-panel--size-large">
+                        <div class="b-panel__b-panel-header">
+                            <div class="b-panel__b-panel-header__title">
+                                <h2 class="b-typography b-typography--h4"><span>Ürün Çeşidi</span></h2>
+                            </div>
+                            <i class="b-icon b-icon--plus-bold"></i>
+                        </div>
+                        <div class="b-panel__b-panel-content">
+                            <div class="b-panel__b-panel-content__inner">
+                                <div class="b-scrollbar__content">
+                                    <label class="b-typography b-typography--p14 b-checkbox filter_filterItemsCheckbox__iQpwl">
+                                        <input type="checkbox" name="category[]" value="Sweatshirt" class="b-checkbox__input" <?= (isset($_GET['category']) && in_array("Sweatshirt", $_GET['category']??[]))?'checked':'' ?> />
+                                        <div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div>
+                                        <div class="b-checkbox__label"><span>Sweatshirt</span></div>
+                                    </label>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                                    
+                    
+
+                    <div class="b-panel b-panel--size-large">
+                        <div class="b-panel__b-panel-header">
+                            <div class="b-panel__b-panel-header__title">
+                                <h2 class="b-typography b-typography--h4"><span>Fiyat</span></h2>
+                            </div>
+                            <i class="b-icon b-icon--plus-bold"></i>
+                        </div>
+                        <div class="b-panel__b-panel-content">
+                            <div class="b-panel__b-panel-content__inner">
+                                <div class="b-range b-range--size-small" style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="number" name="min_price" placeholder="Min" value="<?= $_GET['min_price'] ?? '' ?>" style="width: 100%; padding: 5px; border: 1px solid #ccc;" />
+                                    <span>-</span>
+                                    <input type="number" name="max_price" placeholder="Max" value="<?= $_GET['max_price'] ?? '' ?>" style="width: 100%; padding: 5px; border: 1px solid #ccc;" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> </div>
+        </div>
+
+        <div style="padding: 20px 0; display: flex; flex-direction: column; gap: 10px;">
+            <button type="submit" style="background-color: #000; color: #fff; border: 1px solid #000; padding: 12px; font-weight: bold; cursor: pointer; width: 100%;">
+                FİLTRELE
+            </button>
+
+            <button type="button" onclick="window.location.href=window.location.pathname" style="background-color: #fff; color: #000; border: 1px solid #ddd; padding: 12px; font-weight: bold; cursor: pointer; width: 100%;">
+                SEÇİMLERİ TEMİZLE
+            </button>
+        </div>
+
+    </form>
+</div>
+              
+
+<!--urun listeleri-->
 
                   
                   <div class="b-grid b-grid--col b-grid--col-10">
@@ -203,6 +303,7 @@ $total_products = $result->num_rows;
                           </div>
                       </section>
                   </div>
+                  </div>
               </div>
           </div>
       </section>
@@ -222,5 +323,48 @@ $total_products = $result->num_rows;
       <div class="footer-bottom_footerBottom__fpW9_"><div class="b-grid b-grid--container footer-bottom_footerBottomContainerWrapper__N3tx5"><div class="b-grid b-grid--row b-grid--nogutter footer-bottom_footerBottomContainer__Z3kuT"><div class="b-grid b-grid--nogutter b-grid--col b-grid--col-6 b-grid--col-sm-12 b-grid--col-md-5 footer-bottom_footerBottomContainerBox__8d0Ua"><div class="footer-bottom_footerBottomContainerBoxLogo__cNIgu"><span style="box-sizing:border-box;display:inline-block;overflow:hidden;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0;position:relative;max-width:100%"><span style="box-sizing:border-box;display:block;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0;max-width:100%"><img style="display:block;max-width:100%;width:initial;height:initial;background:none;opacity:1;border:0;margin:0;padding:0" alt="" aria-hidden="true" src="data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27149%27%20height=%2726%27/%3e"></span><img alt="Boyner Group" src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2024/03/boyner-group.webp" decoding="async" data-nimg="intrinsic" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%;object-fit:contain"><noscript><img alt="Boyner Group" loading="lazy" decoding="async" data-nimg="intrinsic" style="position:absolute;top:0;left:0;bottom:0;right:0;box-sizing:border-box;padding:0;border:none;margin:auto;display:block;width:0;height:0;min-width:100%;max-width:100%;min-height:100%;max-height:100%;object-fit:contain" src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2024/03/boyner-group.webp"/></noscript></span></div><p class="b-typography b-typography--p14 footer-bottom_footerBottomContainerBoxText__lDc1f">© 2025 Boyner Büyük Mağazacılık A.Ş.</p></div><div class="b-grid b-grid--nogutter b-grid--col b-grid--col-6 b-grid--col-sm-12 b-grid--col-md-6 b-grid--col-sm-0-offset footer-bottom_footerBottomContainerItems__eLiV4"><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/uyelik-sozlesmesi"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">Üyelik Sözleşmesi</p></a><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/gizlilik-kurallari-site-kullanim-sartlari"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">Site Kullanım ve Gizlilik Şartları</p></a><a class="footer-bottom_footerBottomContainerItemsText__Xizz9" style="text-decoration:none" href="/content/kisisel-verilerin-korunmasina-iliskin-aydinlatma-metni"><p class="b-typography b-typography--p14" style="color:var(--semantic-foreground-secondary)">KVKK Aydınlatma Metni</p></a></div></div></div></div>
     </div>
   </div>
+
+ <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Başlıkları seç
+    const headers = document.querySelectorAll(".b-panel__b-panel-header");
+
+    headers.forEach(header => {
+        header.addEventListener("click", function(e) {
+            e.preventDefault(); // Sayfanın zıplamasını engelle
+
+            // Paneli ve İçeriği Bul
+            const panel = this.closest(".b-panel");
+            const content = panel.querySelector(".b-panel__b-panel-content");
+            const icon = this.querySelector("i");
+
+            // Kontrol Et: Şu an görünür mü?
+            // (getComputedStyle, CSS dosyasındaki durumu da kontrol eder)
+            const isOpen = window.getComputedStyle(content).display === "block";
+
+            if (isOpen) {
+                // AÇIKSA -> KAPAT
+                content.style.display = "none";
+                
+                // İkonu Artı (+) yap
+                if(icon) {
+                    icon.className = "b-icon b-icon--plus-bold";
+                }
+            } else {
+                // KAPALIYSA -> AÇ (Zorla Stil Veriyoruz)
+                content.style.display = "block";
+                content.style.height = "auto";
+                content.style.opacity = "1";
+                content.style.visibility = "visible";
+                
+                // İkonu Eksi (-) yap
+                if(icon) {
+                    icon.className = "b-icon b-icon--minus-medium";
+                }
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
