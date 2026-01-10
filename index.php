@@ -43,14 +43,13 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <title>Document</title>
+  <title>Boyner</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/content.css">
   <<link rel="stylesheet" href="css/boyner.css">
 
   <style>::after
 
-    /*bu kisim style de calismiyor neden ona bak*/
   /*popup icin css kodlari*/
 /* --- Modal (Popup) Arkaplanı --- */
 .modal {
@@ -134,6 +133,26 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     border: 1px solid red;
 }
 
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+
+    border: 2px solid #000;      /* Hafif kalın siyah kenar */
+    border-radius: 4px;          /* Çok yuvarlak değil */
+    background-color: #fff;
+    font-size: 14px;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+
 </style>
 </head>
 <body>
@@ -167,9 +186,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
             <?php endif; ?> 
           <li ><i class="far fa-heart ince-yap"></i></li>
-          <li><a href="summary.php">
-    <li><i class="fas fa-shopping-bag"></i></li>
-  </a></li>
+          <li><a href="summary.php"><li><i class="fas fa-shopping-bag"></i></li></a></li>
         </ul>
       </div>
       <?php if (isset($login_error) && !empty($login_error)): ?>
@@ -250,7 +267,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     <div class="categories"> <!--tum resimler ayni bunlar duzenlenicek-->
       <div class="category">
-        <a href="">
           <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
           <h6>Dış Giyim</h6>
         </a>
