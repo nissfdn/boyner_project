@@ -43,6 +43,19 @@ if ($id > 0) {
     font-weight: bold;
     font-family: sans-serif;
 }
+
+/* Linklerin temel hali */
+.direction a {
+    text-decoration: none;
+    color: #666; /* Standart gri renk */
+    transition: font-weight 0.2s ease, color 0.2s ease;
+}
+
+/* Üzerine gelince (hover) olacak değişim */
+.direction a:hover span {
+    font-weight: 500 !important; /* Çok kalın olması için 900 verdik */
+    color: #000 !important;      /* Daha belirgin olması için tam siyah yaptık */
+}
 </style>
 </head>
 <body>
@@ -93,20 +106,21 @@ if ($id > 0) {
     </div>
 
     <div class="container">
-        <div class="index-header">
-            <div class="direction">
-              <span>Anasayfa</span>
-              <span> / </span>
-              <span>Çocuk</span>
-              <span> / </span>
-              <span>Giyim</span>
-              <span> / </span>
-              <span>Sweatshirt</span>
-              <span> / </span>
-              <span style="color: #999;"  > Ürün ismi  </span>
- 
-            </div>
-          </div>
+<div class="index-header">
+    <div class="direction">
+        <a href="index.php" style="text-decoration: none; color: inherit;"><span>Anasayfa</span></a>
+        <span> / </span>
+        <a href="index.php" style="text-decoration: none; color: inherit;"><span>Çocuk</span></a>
+        <span> / </span>
+
+        <a href="products.php" style="text-decoration: none; color: inherit;"><span>Giyim</span></a>
+        <span> / </span>
+        <a href="products.php" style="text-decoration: none; color: inherit;"><span>Sweatshirt</span></a>
+        <span> / </span>
+
+        <span style="color: #999;"><?= $product['name'] ?></span>
+    </div>
+</div>
         
           <div class="addBasket"  style="display: none;">
             <div class="">
@@ -137,12 +151,18 @@ if ($id > 0) {
                     <form action="add_to_cart.php" method="POST">
 
 
-    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-    <input type="hidden" name="product_name" value="<?= $product['name'] ?>">
-    <input type="hidden" name="product_price" value="<?= $product['price'] ?>">
+<input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+<input type="hidden" name="product_name" value="<?= $product['name'] ?>">
+<input type="hidden" name="product_price" value="<?= $product['price'] ?>">
 <input type="hidden" name="product_image" id="product_image" value="<?= $product['image'] ?>">
-<input type="hidden" name="product_color" id="product_color">
-<input type="hidden" name="product_size"  id="product_size">
+
+<?php 
+    $color_variants->data_seek(0);
+    $first_v = $color_variants->fetch_assoc();
+    $default_color = ($color_variants->num_rows == 1) ? $first_v['color'] : '';
+?>
+<input type="hidden" name="product_color" id="product_color" value="<?= $default_color ?>">
+<input type="hidden" name="product_size" id="product_size">
 
 
 
@@ -150,37 +170,45 @@ if ($id > 0) {
 <br><br>
 
 
+<?php 
+$variant_count = $color_variants->num_rows; 
 
-<label style="font-weight: bold;">Renk: <span id="selectedColorName" style="font-weight: normal; color: #666;">Seçiniz</span></label>
-<div class="color-variant-wrapper" style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-    <?php while($v = $color_variants->fetch_assoc()): ?>
-        <label class="color-option" style="cursor: pointer;">
-            <input type="radio" name="color_id" value="<?= $v['id'] ?>" 
-                   data-color-name="<?= $v['color'] ?>" 
-                   data-image="<?= $v['image'] ?>" 
-                   onchange="updateVariant(this)" required style="display: none;">
-            
-            <div class="image-box-container">
-                <?php 
-                // Varyant resmi yoksa ana resmi kullan
-                $img_name = (!empty($v['image'])) ? $v['image'] : $product['image'];
+if ($variant_count > 1): ?>
+    <label style="font-weight: bold;">Renk: <span id="selectedColorName" style="font-weight: normal; color: #666;">Seçiniz</span></label>
+    <div class="color-variant-wrapper" style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+        <?php while($v = $color_variants->fetch_assoc()): ?>
+            <label class="color-option" style="cursor: pointer;">
+                <input type="radio" name="color_id" value="<?= $v['id'] ?>" 
+                       data-color-name="<?= $v['color'] ?>" 
+                       data-image="<?= $v['image'] ?>" 
+                       onchange="updateVariant(this)" required style="display: none;">
                 
-                // Eğer SQL'de nokta eksikse (25(2)webp gibi) otomatik nokta ekleme denemesi:
-                if (!strpos($img_name, '.')) {
-                    $img_name = str_replace('webp', '.webp', $img_name);
-                }
-                ?>
-                <img src="images/<?= $img_name ?>" alt="<?= $v['color'] ?>" 
-                     style="width: 70px; height: 90px; object-fit: cover; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2px;">
-                <div style="font-size: 10px; text-align: center; color: #666;"><?= ucfirst($v['color']) ?></div>
-            </div>
-        </label>
-    <?php endwhile; ?>
-</div>
+                <div class="image-box-container">
+                    <img src="images/<?= (!empty($v['image'])) ? $v['image'] : $product['image'] ?>" 
+                         style="width: 70px; height: 90px; object-fit: cover; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2px;">
+                    <div style="font-size: 10px; text-align: center; color: #666;"><?= ucfirst($v['color']) ?></div>
+                </div>
+            </label>
+        <?php endwhile; ?>
+    </div>
+<?php else: ?>
+    <?php 
+    $color_variants->data_seek(0);
+    $single_v = $color_variants->fetch_assoc(); 
+    if($single_v): 
+    ?>
+        <input type="hidden" name="color_id" value="<?= $single_v['id'] ?>">
+        
+        <script>
+            document.getElementById('product_color').value = "<?= $single_v['color'] ?>";
+            document.getElementById('product_image').value = "<?= (!empty($single_v['image'])) ? $single_v['image'] : $product['image'] ?>";
+        </script>
+    <?php endif; ?>
+<?php endif; ?>
 
 <label style="font-weight: bold;">Beden</label><br>
 <select name="variant_id" id="sizeSelect" required
-        onchange="document.getElementById('product_size').value=this.options[this.selectedIndex].text">
+        onchange="document.getElementById('product_size').value=this.options[this.selectedIndex].text"
         style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; margin-top: 8px;">
     <option value="">Beden Seçiniz</option>
     <?php while($s = $size_variants->fetch_assoc()): ?>
@@ -261,6 +289,9 @@ window.onload = function () {
     const checkedRadio = document.querySelector('input[name="color_id"]:checked');
     if (checkedRadio) {
         updateVariant(checkedRadio);
+    } else {
+        // Eğer radyo butonu yoksa (tek renk durumu), PHP'den gelen hidden inputlar zaten dolu olacak.
+        // Ancak yine de kontrol etmek istersen buraya ekleme yapabilirsin.
     }
 };
 </script>
