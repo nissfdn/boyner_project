@@ -28,7 +28,32 @@ foreach ($sepetUrunleri as $urun) {
     <link rel="stylesheet" href="css/boyner.css">
     <link rel="stylesheet" href="css/content.css">
 
+<style>
+.variant-box {
+    margin-top: 8px; /* Ürün adıyla arasındaki boşluk */
+}
+
+.variant-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f3f3f6;    /* Çok hafif gri arka plan */
+    border: 1px solid #e6e6e6;    /* İnce gri çerçeve */
+    border-radius: 24px;          /* Tam oval görünüm için */
+    padding: 5px 15px;            /* İç boşluklar */
+    font-size: 13px;              /* Yazı boyutu */
+    font-weight: 500;             /* Yazı kalınlığı */
+    color: #333;                  /* Yazı rengi */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.variant-btn:hover {
+    background-color: #ededf0;    /* Üzerine gelince çok hafif koyulaşma */
+    border-color: #d1d1d1;
+}
+</style>
 </head>
+
 <body>
     <div class="navbar">
         <div class="container">
@@ -137,9 +162,9 @@ foreach ($sepetUrunleri as $urun) {
 <div class="variant-box">
     <button class="variant-btn">
         <?= htmlspecialchars($urun['color']) ?> / <?= htmlspecialchars($urun['size']) ?>
+        <i class="b-icon b-icon--arrow-down-light" style="font-size: 10px; margin-left: 8px; color: #666;"></i>
     </button>
 </div>
-
                                                 </p>
                                             </a>
                                         </div>
