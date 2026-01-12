@@ -4,7 +4,7 @@ session_start();
 include "config.php"; 
 
 // --- 1. ÇIKIŞ İŞLEMİ ---
-// Linke tıklayınca adres çubuğunda ?cikis=1 yazar, biz de bunu yakalarız.
+
 if (isset($_GET['cikis'])) {
     session_destroy(); // Oturumu bitir
     unset($_SESSION['username']);
@@ -19,7 +19,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Senin istediğin basit sorgu (Güvenlik önlemi yok)
+    
     $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
     $result = mysqli_query($mysqli, $sql);
 
@@ -51,7 +51,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
   <style>::after
 
   /*popup icin css kodlari*/
-/* --- Modal (Popup) Arkaplanı --- */
+
 .modal {
     display: none; /* Varsayılan olarak gizli */
     position: fixed; 
@@ -61,7 +61,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     width: 100%; 
     height: 100%; 
     overflow: auto; 
-    background-color: rgba(0,0,0,0.5); /* Siyah yarı saydam arka plan */
+    background-color: rgba(0,0,0,0.5); 
 }
 
 /* --- Modal İçeriği (Kutu) --- */
@@ -139,7 +139,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     box-sizing: border-box;
 
     border: 2px solid #000;      /* Hafif kalın siyah kenar */
-    border-radius: 4px;          /* Çok yuvarlak değil */
+    border-radius: 4px;          
     background-color: #fff;
     font-size: 14px;
 
@@ -265,7 +265,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
       <h1 style="color:#2B2B38;line-height: 56px; letter-spacing: 2px; font-size: 40px; margin-top: 20px; font-weight: 400;">Çocuk</h1>
     </div>
 
-    <div class="categories"> <!--tum resimler ayni bunlar duzenlenicek-->
+    <div class="categories"> 
       <div class="category">
           <img src="https://boyner-marketplace-ecom-cms-small-prod.mncdn.com/wp-content/uploads/2025/12/disgym_1764690282.jpg" alt="">
           <h6>Dış Giyim</h6>

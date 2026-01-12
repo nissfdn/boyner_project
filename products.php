@@ -2,8 +2,24 @@
 session_start();
 include "Config.php";
 
+$colorResult = $mysqli->query("
+    SELECT DISTINCT pv.color
+    FROM product_variants pv
+    WHERE pv.color IS NOT NULL
+");
+$sizeResult = $mysqli->query("
+    SELECT DISTINCT pv.size
+    FROM product_variants pv
+    WHERE pv.size IS NOT NULL
+    ORDER BY pv.size ASC
+");
+
+
 // WHERE şartlarını tutacak dizimiz
 $where = [];
+
+$variantFilterActive = !empty($_GET['color']) || !empty($_GET['size']);
+
 
 // --- 1. CİNSİYET (DÜZELTİLDİ) ---
 // Artık checkbox kullandığımız için burası da dizi mantığıyla (IN) çalışmalı
@@ -28,37 +44,98 @@ if (!empty($_GET['brand'])) {
 // --- 3. KATEGORİ ---
 if (!empty($_GET['category'])) {
     $cats = array_map(fn($c)=>"'".$mysqli->real_escape_string($c)."'", $_GET['category']);
-    $where[] = "category IN (".implode(",", $cats).")";
+    $where[] = "p.category IN (".implode(",", $cats).")";
 }
 
+// --- 4. RENK ---
+if (!empty($_GET['color'])) {
 
-// --- 4. FİYAT ---
+    // checkbox olduğu için dizi bekliyoruz
+    $colors = array_map(
+        fn($c) => "'" . $mysqli->real_escape_string($c) . "'",
+        $_GET['color']
+    );
+
+    $where[] = "pv.color IN (" . implode(",", $colors) . ")";
+}
+
+// --- 5. BEDEN ---
+if (!empty($_GET['size'])) {
+
+    $sizes = array_map(
+        fn($s) => "'" . $mysqli->real_escape_string($s) . "'",
+        $_GET['size']
+    );
+
+    $where[] = "pv.size IN (" . implode(",", $sizes) . ")";
+}
+
+// --- 6. FİYAT ---
 if (!empty($_GET['min_price']) && !empty($_GET['max_price'])) {
-    // Sayı olduklarından emin olmak için (int) eklemek iyi olur
+    
     $min = (int)$_GET['min_price'];
     $max = (int)$_GET['max_price'];
     $where[] = "price BETWEEN $min AND $max";
 }
 
 // --- SORGUE OLUŞTURMA ---
-$sql = "SELECT * FROM products";
 
+// Önce varyasyon filtresi var mı kontrol edelim
+$variantFilterActive = !empty($_GET['color']) || !empty($_GET['size']);
+
+$sql = "SELECT 
+            p.id,
+            p.brand,
+            p.name,
+            p.price,
+            p.category,
+            p.gender,
+            p.desription,
+            
+            /* Renk seçimi: Filtre varsa o satırdaki rengi, yoksa rastgele bir rengi al */
+            MAX(pv.color) AS color, 
+            
+            /* Resim seçimi: Varyasyon resmi varsa onu, yoksa ana resmi al */
+            COALESCE(NULLIF(MAX(pv.image), ''), p.image) AS image
+            
+        FROM products p
+        LEFT JOIN product_variants pv ON p.id = pv.product_id ";
+
+// WHERE Şartlarını Ekleme
 if (!empty($where)) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
 
-$sql .= " ORDER BY id DESC";
+// --- DİNAMİK GRUPLAMA ---
 
-// --- SORGUE ÇALIŞTIRMA ---
-$result = $mysqli->query($sql);
-
-if (!$result) {
-    die("Sorgu Hatası: " . $mysqli->error);
+if ($variantFilterActive) {
+    // Eğer renk/beden seçildiyse: Her rengi ayrı ürün gibi göster
+    $sql .= " GROUP BY p.id, pv.color "; 
+} else {
+    // Eğer filtre yoksa: Sadece ana ürünleri (25 tane) göster
+    $sql .= " GROUP BY p.id "; 
 }
 
-// Verileri çek
-$products = $result->fetch_all(MYSQLI_ASSOC);
-$total_products = $result->num_rows; 
+// Sıralama
+$sql .= " ORDER BY p.id DESC";
+
+
+// --- SORGUYU ÇALIŞTIRMA ---
+try {
+    $result = $mysqli->query($sql);
+    
+    if (!$result) {
+        throw new Exception($mysqli->error);
+    }
+    
+    $products = $result->fetch_all(MYSQLI_ASSOC);
+    $total_products = $result->num_rows; 
+
+} catch (Exception $e) {
+    echo "Hata: " . $e->getMessage();
+    exit;
+}
+
 ?>
 
 
@@ -142,12 +219,12 @@ $total_products = $result->num_rows;
             <div class="b-scrollbar__content">
                 <div class="b-accordion b-accordion--transparent b-accordion--large">
 
-                    <div class="b-panel b-panel--expanded b-panel--size-large">
+                    <div class="b-panel b-panel--size-large">
                         <div class="b-panel__b-panel-header">
                             <div class="b-panel__b-panel-header__title">
                                 <h2 class="b-typography b-typography--h4"><span>Cinsiyet</span></h2>
                             </div>
-                            <i class="b-icon b-icon--minus-medium"></i>
+                            <i class="b-icon b-icon--plus-bold"></i>
                         </div>
                         <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded">
                             <div class="b-panel__b-panel-content__inner">
@@ -172,12 +249,12 @@ $total_products = $result->num_rows;
                         </div>
                     </div>
 
-                    <div class="b-panel b-panel--expanded b-panel--size-large">
+                    <div class="b-panel b-panel--size-large">
                         <div class="b-panel__b-panel-header">
                             <div class="b-panel__b-panel-header__title">
                                 <h2 class="b-typography b-typography--h4"><span>Marka</span></h2>
                             </div>
-                            <i class="b-icon b-icon--minus-medium"></i>
+                            <i class="b-icon b-icon--plus-bold"></i>
                         </div>
                         <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded">
                             <div class="b-panel__b-panel-content__inner">
@@ -187,8 +264,8 @@ $total_products = $result->num_rows;
                                 <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small b-scrollbar--scrolling-hide filter_filterItemsCheckboxs__NPrqw">
                                     <div class="b-scrollbar__content">
                                         <?php 
-                                        //manuel eklendi
-                                        $markalar = ["U.S. Polo Assn.", "Gap", "Nike", "Mavi", "Barbie", "Jeep", "United Colors of Benetton", "Calvin Klein", "Mayoral", "Puma"];
+                                        
+                                        $markalar = ["U.S. Polo Assn.", "Gap", "Nike", "Mavi", "Barbie", "Jeep", "United Colors of Benetton", "Calvin Klein", "Mayoral", "Puma","MSHB&G"];
                                         foreach($markalar as $marka): 
                                         ?>
                                         <label class="b-typography b-typography--p14 b-checkbox b-checkbox--large b-checkbox--align-center b-checkbox--filled filter_filterItemsCheckbox__iQpwl">
@@ -205,6 +282,63 @@ $total_products = $result->num_rows;
                     </div>
 
                     <div class="b-panel b-panel--size-large">
+    <div class="b-panel__b-panel-header">
+        <div class="b-panel__b-panel-header__title">
+            <h2 class="b-typography b-typography--h4"><span>Renk</span></h2>
+        </div>
+        <i class="b-icon b-icon--plus-bold"></i>
+    </div>
+
+    <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded">
+        <div class="b-panel__b-panel-content__inner">
+            <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small">
+                <div class="b-scrollbar__content">
+
+                    <?php while($row = $colorResult->fetch_assoc()): ?>
+<label>
+    <input type="checkbox" name="color[]" value="<?= $row['color'] ?>"
+        <?= (isset($_GET['color']) && in_array($row['color'], $_GET['color'])) ? 'checked' : '' ?>>
+    <?= ucfirst($row['color']) ?>
+</label>
+<?php endwhile; ?>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="b-panel b-panel--size-large">
+    <div class="b-panel__b-panel-header">
+        <div class="b-panel__b-panel-header__title">
+            <h2 class="b-typography b-typography--h4"><span>Beden</span></h2>
+        </div>
+        <i class="b-icon b-icon--plus-bold"></i>
+    </div>
+
+    <div class="b-panel__b-panel-content b-panel__b-panel-content--expanded">
+        <div class="b-panel__b-panel-content__inner">
+            <div class="b-scrollbar b-scrollbar--vertical b-scrollbar--small">
+                <div class="b-scrollbar__content">
+
+                    <?php while($row = $sizeResult->fetch_assoc()): ?>
+                        <label>
+                            <input type="checkbox"
+                                   name="size[]"
+                                   value="<?= $row['size'] ?>"
+                                   <?= (isset($_GET['size']) && in_array($row['size'], $_GET['size'])) ? 'checked' : '' ?>>
+                            <?= $row['size'] ?>
+                        </label>
+                    <?php endwhile; ?>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                    <div class="b-panel b-panel--size-large">
                         <div class="b-panel__b-panel-header">
                             <div class="b-panel__b-panel-header__title">
                                 <h2 class="b-typography b-typography--h4"><span>Ürün Çeşidi</span></h2>
@@ -215,7 +349,7 @@ $total_products = $result->num_rows;
                             <div class="b-panel__b-panel-content__inner">
                                 <div class="b-scrollbar__content">
                                     <label class="b-typography b-typography--p14 b-checkbox filter_filterItemsCheckbox__iQpwl">
-                                        <input type="checkbox" name="category[]" value="Sweatshirt" class="b-checkbox__input" <?= (isset($_GET['category']) && in_array("Sweatshirt", $_GET['category']??[]))?'checked':'' ?> />
+                                        <input type="checkbox" name="category[]" value="Giyim" class="b-checkbox__input" <?= (isset($_GET['category']) && in_array("Giyim", $_GET['category']??[]))?'checked':'' ?> />
                                         <div class="b-checkbox__box"><i class="b-icon b-icon--checkmark-medium b-checkbox__box__icon"></i></div>
                                         <div class="b-checkbox__label"><span>Sweatshirt</span></div>
                                     </label>
@@ -278,7 +412,7 @@ $total_products = $result->num_rows;
                             
                             <?php foreach ($products as $product): ?>
   <div class="product-container">
-    <a href="shopping.php?id=<?= $product['id'] ?>">
+    <a href="shopping.php?id=<?= $product['id'] ?>&color=<?= urlencode($product['color']) ?>">
       <div class="product-incontent">
         <div class="product-image">
           <img src="/boyner_project/images/<?= rawurlencode($product['image']) ?>" style="width:100%">
@@ -289,6 +423,12 @@ $total_products = $result->num_rows;
             <strong><?= $product['brand'] ?></strong>
             <?= $product['name'] ?>
           </p>
+          <?php if (!empty($product['color'])): ?>
+  <p class="product-color">
+    Renk: <strong><?= ucfirst($product['color']) ?></strong>
+  </p>
+<?php endif; ?>
+
           <p>
             <strong><?= number_format($product['price'], 0, ',', '.') ?> TL</strong>
           </p>

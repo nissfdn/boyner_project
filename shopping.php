@@ -16,7 +16,36 @@ if ($id > 0) {
 
     // BEDENLER: 3, 4, 5 gibi sadece tekil değerleri göstermek için GROUP BY size ekledik
     $size_variants = $mysqli->query("SELECT * FROM product_variants WHERE product_id = $id GROUP BY size ORDER BY size ASC");
+    
+    // ... Queries ended above ...
+
+// 1. Get the color from URL parameters (e.g., ?color=Black)
+$url_color = isset($_GET['color']) ? urldecode($_GET['color']) : null;
+
+// 2. Set default image (main product image)
+$display_image = $product['image']; 
+$selected_color_name = "Select Color"; // or "Seçiniz" for UI text
+
+// 3. If a color comes from URL, find its image in variants
+if ($url_color) {
+    // Reset pointer to the beginning of the result set
+    if ($color_variants->num_rows > 0) {
+        $color_variants->data_seek(0); 
+        while($variant = $color_variants->fetch_assoc()) {
+            if ($variant['color'] == $url_color) {
+                // Use variant image if exists, otherwise keep main image
+                $display_image = !empty($variant['image']) ? $variant['image'] : $product['image'];
+                $selected_color_name = $variant['color'];
+                break; // Found it, stop the loop
+            }
+        }
+        // Reset pointer again for the HTML loop below
+        $color_variants->data_seek(0);
+    }
 }
+    }
+
+
 ?>
 
 
@@ -137,7 +166,7 @@ if ($id > 0) {
 <!--databasedeki verileri bagladik name image price falan-->
           <div class="content" >
             <div class="images">
-                <img id="mainImage" src="images/<?= $product['image'] ?>" alt="">
+                <img id="mainImage" src="images/<?= $display_image ?>" alt="">
             </div>
             <div class="infos">
                 <h1 style="font-size: 24px;"><strong><?= $product['brand'] ?></strong> <?= $product['name'] ?></h1>
@@ -176,20 +205,29 @@ $variant_count = $color_variants->num_rows;
 if ($variant_count > 1): ?>
     <label style="font-weight: bold;">Renk: <span id="selectedColorName" style="font-weight: normal; color: #666;">Seçiniz</span></label>
     <div class="color-variant-wrapper" style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-        <?php while($v = $color_variants->fetch_assoc()): ?>
-            <label class="color-option" style="cursor: pointer;">
-                <input type="radio" name="color_id" value="<?= $v['id'] ?>" 
-                       data-color-name="<?= $v['color'] ?>" 
-                       data-image="<?= $v['image'] ?>" 
-                       onchange="updateVariant(this)" required style="display: none;">
-                
-                <div class="image-box-container">
-                    <img src="images/<?= (!empty($v['image'])) ? $v['image'] : $product['image'] ?>" 
-                         style="width: 70px; height: 90px; object-fit: cover; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2px;">
-                    <div style="font-size: 10px; text-align: center; color: #666;"><?= ucfirst($v['color']) ?></div>
-                </div>
-            </label>
-        <?php endwhile; ?>
+        <?php 
+// Reset pointer to ensure we start from the first variant
+$color_variants->data_seek(0);
+
+while($variant = $color_variants->fetch_assoc()): 
+    // Check if this variant matches the URL color
+    $isChecked = ($variant['color'] == $url_color) ? 'checked' : '';
+?>
+    <label class="color-option" style="cursor: pointer;">
+        <input type="radio" name="color_id" value="<?= $variant['id'] ?>" 
+               data-color-name="<?= $variant['color'] ?>" 
+               data-image="<?= $variant['image'] ?>" 
+               onchange="updateVariant(this)" 
+               <?= $isChecked ?> 
+               required style="display: none;">
+        
+        <div class="image-box-container">
+            <img src="images/<?= (!empty($variant['image'])) ? $variant['image'] : $product['image'] ?>" 
+                 style="width: 70px; height: 90px; object-fit: cover; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2px;">
+            <div style="font-size: 10px; text-align: center; color: #666;"><?= ucfirst($variant['color']) ?></div>
+        </div>
+    </label>
+<?php endwhile; ?>
     </div>
 <?php else: ?>
     <?php 
@@ -253,14 +291,14 @@ if ($variant_count > 1): ?>
 
 <script>
 function updateVariant(element) {
-    // 1️⃣ Renk adı
+    // 1️ Renk adı
     const colorName = element.getAttribute('data-color-name');
     const nameLabel = document.getElementById("selectedColorName");
     if (nameLabel) {
         nameLabel.innerText = colorName;
     }
 
-    // 2️⃣ Resim
+    // 2️ Resim
     let variantImage = element.getAttribute('data-image');
     const mainImage = document.getElementById("mainImage");
     const defaultProductImage = "images/<?= $product['image'] ?>";
@@ -279,12 +317,12 @@ function updateVariant(element) {
         variantImage = "<?= $product['image'] ?>";
     }
 
-    // 🔥 3️⃣ SEPETE GİDECEK GERÇEK VERİLER
+    //  SEPETE GİDECEK GERÇEK VERİLER
     document.getElementById('product_color').value = colorName;
     document.getElementById('product_image').value = variantImage;
 }
 
-// ✅ SAYFA AÇILINCA SEÇİLİ RENK VARSA ÇALIŞTIR
+//  SAYFA AÇILINCA SEÇİLİ RENK VARSA ÇALIŞTIR
 window.onload = function () {
     const checkedRadio = document.querySelector('input[name="color_id"]:checked');
     if (checkedRadio) {
