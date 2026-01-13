@@ -61,10 +61,11 @@
     flex-direction: column;
 }
 .images{
-width: 100%;
+width: 90%;
 }
 .images img{
-    width: 100%;
+    width: 98%;
+    padding: 0px 40px 0px 0px;
 }
 .infos{
     width: 100%;

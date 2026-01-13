@@ -91,8 +91,9 @@ if ($url_color) {
     <div class="navbar">
         <div class="container">
         <div class="topnav">
+        <a href="index.php">
           <img src="https://boyner-stook-frontend.mncdn.com/web-ui/logo.svg" alt="logo">
-          
+        </a>          
           <div class="searchbar">
             <div>O</div>
             <input type="text" name="search" id="search" placeholder="Hadi gel aradığını hızlıca bulalım...">

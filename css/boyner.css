@@ -20523,7 +20523,8 @@ body {
     position: sticky;
     top: 90px;
     z-index: 1;
-    transition: top var(--transition-duration) var(--transition-function)
+    transition: top var(--transition-duration) var(--transition-function);
+    min-width: 200px;
 }
 
 .filter_filtersContainerWithMargin__yqvrE {

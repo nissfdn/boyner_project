@@ -154,8 +154,9 @@ try {
     <div class="navbar">
         <div class="container">
         <div class="topnav">
+        <a href="index.php">
           <img src="https://boyner-stook-frontend.mncdn.com/web-ui/logo.svg" alt="logo">
-          
+        </a>          
           <div class="searchbar">
             <div>O</div>
             <input type="text" name="search" id="search" placeholder="Hadi gel aradığını hızlıca bulalım...">
@@ -205,7 +206,7 @@ try {
               <nav aria-label="breadcrumb" class="b-breadcrumb b-large layout_layoutBreadcrumbs__VnTCB" data-part="b-breadcrumb">
                   <ol class="b-breadcrumb__list">
                       <li class="b-breadcrumb__item b-breadcrumb__item--large" data-part="b-breadcrumb__item"><a class="b-breadcrumb__item-link" style="text-decoration:none" href=""><p class="b-typography b-typography--p14">Anasayfa</p></a></li>
-                      <li class="b-breadcrumb__item b-breadcrumb__item--large" data-part="b-breadcrumb__item"><a class="b-breadcrumb__item-link" style="text-decoration:none" href="index.html"><p class="b-typography b-typography--p14">Çocuk</p></a></li>
+                      <li class="b-breadcrumb__item b-breadcrumb__item--large" data-part="b-breadcrumb__item"><a class="b-breadcrumb__item-link" style="text-decoration:none" href="index.php"><p class="b-typography b-typography--p14">Çocuk</p></a></li>
                       <li class="b-breadcrumb__item b-breadcrumb__item--large" data-part="b-breadcrumb__item"><span class="b-breadcrumb__item-active"><p class="b-typography b-typography--p14">Çocuk Üst Giyim</p></span></li>
                   </ol>
               </nav>
